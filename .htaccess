@@ -56,3 +56,4 @@ AddType font/woff2 .woff2
   Require all denied
 </FilesMatch>
 RedirectMatch 404 /\.git
+RedirectMatch 404 ^/brand-sources/

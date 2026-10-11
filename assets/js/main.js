@@ -195,7 +195,6 @@
   function setMotion(paused) {
     html.classList.toggle("motion-paused", paused);
     mt.forEach(function (b) {
-      b.setAttribute("aria-pressed", paused ? "true" : "false");
       b.textContent = paused ? "تشغيل الحركة" : "إيقاف الحركة";
     });
   }
@@ -276,8 +275,18 @@
       var r = window.MKN ? window.MKN.ref() : "";
       if (r) lines.push("", "— رمز المصدر: " + r, "— صفحة الدخول: " + (window.MKN.attribution().landing_page || location.pathname));
       var text = lines.join("\n");
+      // email copy (lead.php on the server) — WhatsApp still opens for a faster reply
+      var fd = new FormData(form);
+      fd.append("ref", r || "");
+      fd.append("landing", (window.MKN && window.MKN.attribution().landing_page) || location.pathname);
+      var mailed;
+      try {
+        mailed = fetch("lead.php", { method: "POST", body: fd, keepalive: true })
+          .then(function (res) { return res.ok ? res.json() : { ok: false }; })
+          .then(function (j) { return !!(j && j.ok); }, function () { return false; });
+      } catch (e) { mailed = Promise.resolve(false); }
       if (window.MKN) window.MKN.track("generate_lead", {
-        form_id: "contact", method: "whatsapp", department: d.get("service") || "", market: d.get("country") || "",
+        form_id: "contact", method: "email_whatsapp", department: d.get("service") || "", market: d.get("country") || "",
         budget_range: d.get("budget") || "", timing: d.get("timing") || "", content_name: d.get("service") || ""
       });
       var url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
@@ -285,6 +294,9 @@
       if (ok) {
         ok.textContent = "فتحنا واتساب برسالتك الجاهزة — اضغط «إرسال» هناك لإتمام الطلب. إن لم يفتح واتساب، استخدم أحد الخيارات أدناه.";
         ok.classList.add("show");
+        mailed.then(function (sent) {
+          if (sent) ok.textContent = "وصلنا طلبك ✓ ونرد خلال يوم عمل. ولتسريع التواصل اضغط «إرسال» في واتساب أيضًا.";
+        });
       }
       if (alt) {
         alt.hidden = false;

@@ -967,3 +967,54 @@ body.wa-hide .wa-float { opacity: 0; transform: translateY(90px); pointer-events
 }
 @media (prefers-reduced-motion: reduce) and (max-width: 640px) { .logo-track .ltile--fill img { max-height: 56px; } }
 @media (min-width: 641px) { .logo-wall { grid-template-columns: repeat(5, 1fr); } }
+
+/* spam trap field (never shown) + founder note */
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.founder__note { margin: 16px 0 0; font-size: 14px; color: var(--muted); }
+.section--dark .founder__note { color: var(--muted-d); }
+.founder__note a { color: var(--sky-ink); text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 4px 0; }
+.section--dark .founder__note a { color: var(--sky); }
+
+/* ---- client logos: review fixes ---- */
+/* let tile shadows fade out instead of being cut by the rail */
+.logo-rail { padding-block: 10px 32px; }
+.logo-rail + .logo-rail { margin-top: -26px; }
+.logos { padding-bottom: 32px; }
+/* hover effects only where a real pointer can hover (a tap must not leave a tilted, frozen tile) */
+.logo-rail:hover .logo-track { animation-play-state: running; }
+.ltile:hover, .ltile:hover img { transform: none; }
+.ltile:hover { box-shadow: 0 14px 30px -22px rgba(16,22,26,.45); }
+.logo-wall .ltile:hover { box-shadow: 0 14px 30px -22px rgba(16,22,26,.45); }
+@media (hover: hover) {
+  .logo-rail:hover .logo-track { animation-play-state: paused; }
+  .ltile:hover { transform: translateY(-6px) rotate(-1.5deg); box-shadow: 0 22px 40px -24px rgba(16,22,26,.6); }
+  .ltile:hover img { transform: scale(1.06); }
+}
+/* paused rails become swipeable rows, so every logo stays reachable */
+.motion-paused .logo-track { animation: none; }
+.motion-paused .logo-track .dup { display: none; }
+.motion-paused .logo-rail { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-mask-image: none; mask-image: none; }
+.motion-paused .logo-rail::-webkit-scrollbar { display: none; }
+.motion-paused .logo-track { padding-inline: 24px; }
+.motion-toggle { min-height: 44px; }
+/* logo wall: two even rows of eight on desktop, four columns on tablets */
+.logo-wall .ltile:not(.ltile--fill) img { max-height: 56px; }
+@media (min-width: 1081px) { .logo-wall { grid-template-columns: repeat(8, 1fr); } }
+@media (min-width: 641px) and (max-width: 1080px) { .logo-wall { grid-template-columns: repeat(4, 1fr); } }
+/* full-artwork tiles: image height = tile − padding − border */
+.ltile--fill img { max-height: 90px; }
+.logo-wall .ltile--fill img { max-height: 78px; }
+@media (max-width: 640px) {
+  .ltile--fill img { max-height: 72px; }
+  .logo-wall .ltile--fill img { max-height: 58px; }
+}
+/* reduced motion on phones: one tidy 4-column grid of all logos */
+@media (prefers-reduced-motion: reduce) and (max-width: 640px) {
+  .logos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding-inline: 16px; }
+  .logos__head { grid-column: 1 / -1; padding-inline: 0; }
+  .logo-rail, .logo-track { display: contents; }
+  .logo-track .ltile { width: auto; height: 60px; margin: 0; padding: 6px; border-radius: 12px; }
+  .logo-track .ltile img { max-height: 40px; }
+  .logo-track .ltile.ltile--fill { padding: 3px; }
+  .logo-track .ltile--fill img { max-height: 52px; }
+}

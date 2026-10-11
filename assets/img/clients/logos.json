@@ -27,14 +27,15 @@
  "e-spa": {
   "label": "E SPA Dubai",
   "tone": "custom",
-  "bg": "#fff2ec",
+  "bg": "#fff1eb",
   "size": [
    274,
    240
   ],
   "fit": "fill",
-  "clip": "circle(65.9% at 52.56% 62.59%)",
-  "approved": "2026-10-11 · exact uploaded image (approved/E_SPA_APPROVED_Original.png); dark screenshot corners hidden by CSS clip only"
+  "clip": "circle(64% at 52.56% 62.59%)",
+  "approved": "2026-10-11 · exact uploaded image (brand-sources/client-logos/approved/E_SPA_APPROVED_Original.png), colour-managed P3→sRGB downscale; dark screenshot corners hidden by a display-only CSS clip",
+  "src": "e-spa-v2.webp"
  },
  "mireva": {
   "label": "Mireva Group",
@@ -45,14 +46,14 @@
   ]
  },
  "imperio": {
-  "label": "Imperio Events",
+  "label": "IMPERIO Events",
   "tone": "custom",
   "bg": "#2a0403",
   "size": [
    360,
    106
   ],
-  "approved": "2026-10-11 · official wordmark from company profile p.37 (approved/IMPERIO_Approved_Wordmark.png)"
+  "approved": "2026-10-11 · official wordmark from the company profile p.37 (brand-sources/client-logos/approved/IMPERIO_Approved_Wordmark.png)"
  },
  "aqua": {
   "label": "Aqua Software",
@@ -62,13 +63,14 @@
    81
   ]
  },
- "artimal": {
-  "label": "Artimal Gifts",
+ "abnaa-alsheikh": {
+  "label": "أبناء الشيخ — Abnaa Al Sheikh",
   "tone": "light",
   "size": [
-   154,
+   322,
    170
-  ]
+  ],
+  "approved": "2026-10-11 · logo from page 1 of the brand identity PDF sent by the owner (brand-sources/client-logos/abnaa-alsheikh/)"
  },
  "bright-smile": {
   "label": "Bright Smile Dental",
@@ -83,6 +85,14 @@
   "tone": "light",
   "size": [
    196,
+   170
+  ]
+ },
+ "fitness-times": {
+  "label": "Fitness Times",
+  "tone": "dark",
+  "size": [
+   152,
    170
   ]
  },
@@ -110,11 +120,11 @@
    124
   ]
  },
- "fitness-times": {
-  "label": "Fitness Times",
-  "tone": "dark",
+ "artimal": {
+  "label": "Artimal Gifts",
+  "tone": "light",
   "size": [
-   152,
+   154,
    170
   ]
  },
