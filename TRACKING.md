@@ -55,7 +55,7 @@
 | `quote_request` | زر "اطلب عرض سعر" لأي باقة أو حل | `package_id` (مثل `D04-GROWTH` أو `X03`)، `department` | Lead | SubmitForm | تحويل الطلب |
 | `whatsapp_click` | أي نقرة على واتساب | `link_location` (header / floating_button / packages …) | Contact | Contact | تحويل واتساب |
 | `email_click` | نقرة على البريد | `link_location` | Contact | Contact | — |
-| `social_click` | إنستغرام / لينكدإن | `platform` | — | — | — |
+| `social_click` | إنستغرام / فيسبوك / لينكدإن | `platform` | — | — | — |
 | `cta_click` | أي زر أو بطاقة أخرى | `link_text, link_url, link_location` | — | — | — |
 | `select_content` | فتح تبويب قسم في صفحة الباقات | `item_id` (d01–d08) | — | — | — |
 | `view_case` | ظهور حالة عمل على الشاشة | `case_id` | — | — | — |
