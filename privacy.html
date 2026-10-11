@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
@@ -16,21 +16,23 @@
 <meta name="theme-color" content="#0d1114">
 <link rel="icon" href="assets/img/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<script src="assets/js/tracking.js"></script>
+<script src="assets/js/tracking.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap"></noscript>
+<link rel="preload" as="image" href="assets/img/brand/diffusion-dark.webp" type="image/webp">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="header">
   <div class="container"><div class="header__inner">
-    <a href="index.html" class="logo" aria-label="MKN ARABIA — الرئيسية"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="101" height="34"></a>
+    <a href="index.html" class="logo" aria-label="MKN ARABIA — الرئيسية"><img src="assets/img/logo-white-sm.png" alt="MKN ARABIA" width="101" height="34"></a>
     <nav class="nav" aria-label="القائمة الرئيسية">
       <a href="index.html">الرئيسية</a><a href="services.html">الخدمات</a><a href="pricing.html">الباقات</a><a href="work.html">أعمالنا</a><a href="about.html">من نحن</a><a href="contact.html">تواصل</a>
       <a href="#" data-wa class="btn btn--blue btn--sm">ابدأ محادثة</a>
     </nav>
-    <button class="nav-toggle" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
   </div></div>
 </header>
 <main>
@@ -49,7 +51,7 @@
       <details open><summary><span class="label">01</span>البيانات التي نجمعها</summary><p>عند إرسال نموذج التواصل أو مراسلتنا على واتساب: الاسم ورقم الهاتف والبريد واسم الشركة وتفاصيل الطلب التي تختار مشاركتها. وعند تصفح الموقع: بيانات استخدام عامة مثل الصفحات التي زرتها ومصدر الزيارة (مثل معاملات UTM أو الحملة الإعلانية) ونوع الجهاز.</p></details>
       <details open><summary><span class="label">02</span>أدوات القياس</summary><p>قد نستخدم Google Analytics و Google Tag Manager وبكسلات المنصات الإعلانية (مثل Meta و TikTok و Google Ads) لقياس أداء الموقع والحملات. تستخدم هذه الأدوات ملفات تعريف الارتباط أو تقنيات مشابهة، ونحتفظ بمصدر الزيارة على جهازك لمدة تصل إلى 90 يومًا لربط الطلب بالحملة التي جاء منها.</p></details>
       <details open><summary><span class="label">03</span>كيف نستخدم البيانات</summary><p>للرد على طلبك وإعداد عرض السعر، ولفهم أداء الموقع والحملات وتحسينها. لا نبيع بياناتك الشخصية.</p></details>
-      <details open><summary><span class="label">04</span>خياراتك</summary><p>يمكنك حذف ملفات تعريف الارتباط وبيانات الموقع من إعدادات متصفحك، أو استخدام إعدادات الإعلانات في حساباتك على المنصات. ولطلب الاطلاع على بياناتك أو حذفها راسلنا على <a data-email href="#"></a>.</p></details>
+      <details open><summary><span class="label">04</span>خياراتك</summary><p>يمكنك حذف ملفات تعريف الارتباط وبيانات الموقع من إعدادات متصفحك، أو استخدام إعدادات الإعلانات في حساباتك على المنصات. ولطلب الاطلاع على بياناتك أو حذفها راسلنا على <a data-email href="mailto:contact@mknarabia.com">contact@mknarabia.com</a>.</p></details>
     </div>
     <p class="note"><span>آخر تحديث: <span class="ltr">2026</span>. يُنصح بمراجعة هذه الصفحة قانونيًا بحسب الدول التي تعمل فيها الشركة.</span></p>
   </div>
@@ -60,18 +62,18 @@
   <div class="container">
     <div class="footer__grid">
       <div>
-        <a href="index.html" class="logo"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="101" height="34"></a>
+        <a href="index.html" class="logo"><img src="assets/img/logo-white-sm.png" alt="MKN ARABIA" width="101" height="34"></a>
         <p>شريك استراتيجي لنمو الأعمال. نربط الاستراتيجية والإبداع والأداء والتكنولوجيا حول هدف تجاري واحد.</p>
         <p class="slogan">سوّق بالعربي، سوّق صح</p>
         <div class="badge footer-badge" aria-hidden="true">
   <svg viewBox="0 0 120 120"><defs><path id="bpfooter-badge" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs>
-  <text><textPath href="#bpfooter-badge">MKN ARABIA · MARKETING AGENCY · MKN ARABIA · MARKETING AGENCY · </textPath></text></svg>
+  <text direction="ltr"><textPath href="#bpfooter-badge" textLength="286" lengthAdjust="spacing">MKN ARABIA · MARKETING AGENCY · </textPath></text></svg>
   <img src="assets/img/mark-white.png" alt="" width="50" height="50">
 </div>
       </div>
-      <div><h4>الأقسام</h4><ul><li><a href="services.html#d01"><span class="ltr">D01</span> · الاستراتيجية وتخطيط النمو</a></li><li><a href="services.html#d02"><span class="ltr">D02</span> · العلامة والهوية</a></li><li><a href="services.html#d03"><span class="ltr">D03</span> · المحتوى والإنتاج الإبداعي</a></li><li><a href="services.html#d04"><span class="ltr">D04</span> · الإعلانات المدفوعة</a></li><li><a href="services.html#d05"><span class="ltr">D05</span> · المواقع والمتاجر</a></li><li><a href="services.html#d06"><span class="ltr">D06</span> · البحث والقياس</a></li><li><a href="services.html#d07"><span class="ltr">D07</span> · CRM والأتمتة و AI</a></li><li><a href="services.html#d08"><span class="ltr">D08</span> · الأنظمة المخصصة و SaaS</a></li></ul></div>
+      <div><h2 class="fh">الأقسام</h2><ul><li><a href="services.html#d01"><span class="ltr">D01</span> · الاستراتيجية وتخطيط النمو</a></li><li><a href="services.html#d02"><span class="ltr">D02</span> · العلامة والهوية</a></li><li><a href="services.html#d03"><span class="ltr">D03</span> · المحتوى والإنتاج الإبداعي</a></li><li><a href="services.html#d04"><span class="ltr">D04</span> · الإعلانات المدفوعة</a></li><li><a href="services.html#d05"><span class="ltr">D05</span> · المواقع والمتاجر</a></li><li><a href="services.html#d06"><span class="ltr">D06</span> · البحث والقياس</a></li><li><a href="services.html#d07"><span class="ltr">D07</span> · CRM والأتمتة و AI</a></li><li><a href="services.html#d08"><span class="ltr">D08</span> · الأنظمة المخصصة و SaaS</a></li></ul></div>
       <div>
-        <h4>الشركة</h4>
+        <h2 class="fh">الشركة</h2>
         <ul>
           <li><a href="about.html">من نحن</a></li>
           <li><a href="work.html">أعمال مختارة</a></li>
@@ -82,10 +84,10 @@
         </ul>
       </div>
       <div>
-        <h4>تواصل</h4>
+        <h2 class="fh">تواصل</h2>
         <ul>
           <li><a href="#" data-wa><span class="ltr">+20 114 055 2627</span></a></li>
-          <li><a data-email href="#"></a></li>
+          <li><a data-email href="mailto:contact@mknarabia.com">contact@mknarabia.com</a></li>
           <li><a href="https://instagram.com/mknarabia" target="_blank" rel="noopener"><span class="ltr">@mknarabia</span> · Instagram</a></li>
           <li><a href="https://facebook.com/mknarabia" target="_blank" rel="noopener"><span class="ltr">@mknarabia</span> · Facebook</a></li>
           <li><a href="https://linkedin.com/company/mknarabia" target="_blank" rel="noopener">LinkedIn</a></li>
@@ -98,7 +100,7 @@
     </div>
   </div>
 </footer>
-<a class="wa-float" data-wa href="#" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.4-.5.3-.5v-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.4 13.4 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4ZM12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.9 9.9 0 1 1 12 21.8Zm8.4-18.3A11.8 11.8 0 0 0 1.8 17.7L.1 24l6.4-1.7a11.8 11.8 0 0 0 5.6 1.4 11.8 11.8 0 0 0 8.3-20.2Z"/></svg></a>
-<script src="assets/js/main.js"></script>
+<aside aria-label="تواصل سريع"><a class="wa-float" data-wa href="#" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.4-.5.3-.5v-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.4 13.4 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4ZM12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.9 9.9 0 1 1 12 21.8Zm8.4-18.3A11.8 11.8 0 0 0 1.8 17.7L.1 24l6.4-1.7a11.8 11.8 0 0 0 5.6 1.4 11.8 11.8 0 0 0 8.3-20.2Z"/></svg></a></aside>
+<script src="assets/js/main.js" defer></script>
 </body>
 </html>

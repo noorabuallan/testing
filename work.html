@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
@@ -16,21 +16,23 @@
 <meta name="theme-color" content="#0d1114">
 <link rel="icon" href="assets/img/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<script src="assets/js/tracking.js"></script>
+<script src="assets/js/tracking.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap"></noscript>
+<link rel="preload" as="image" href="assets/img/brand/diffusion-dark.webp" type="image/webp">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="header">
   <div class="container"><div class="header__inner">
-    <a href="index.html" class="logo" aria-label="MKN ARABIA — الرئيسية"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="101" height="34"></a>
+    <a href="index.html" class="logo" aria-label="MKN ARABIA — الرئيسية"><img src="assets/img/logo-white-sm.png" alt="MKN ARABIA" width="101" height="34"></a>
     <nav class="nav" aria-label="القائمة الرئيسية">
       <a href="index.html">الرئيسية</a><a href="services.html">الخدمات</a><a href="pricing.html">الباقات</a><a href="work.html" class="active" aria-current="page">أعمالنا</a><a href="about.html">من نحن</a><a href="contact.html">تواصل</a>
       <a href="#" data-wa class="btn btn--blue btn--sm">ابدأ محادثة</a>
     </nav>
-    <button class="nav-toggle" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
+    <button type="button" class="nav-toggle" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
   </div></div>
 </header>
 <main>
@@ -45,6 +47,7 @@
 </section>
 <section class="section section--white" style="padding:64px 0">
   <div class="container">
+    <h2 class="sr-only">كيف نقرأ الأرقام</h2>
     <div class="grid g3">
       <div class="cell"><span class="label">PLATFORM DATA</span><h3>بيانات منصة</h3><p>تعرض بوصفها بيانات منصة.</p></div>
       <div class="cell"><span class="label">ACTIVITY RESULTS</span><h3>نتائج نشاط</h3><p>تعرض بوصفها نتائج نشاط العميل.</p></div>
@@ -55,7 +58,7 @@
 </section>
 <section class="section section--aura">
   <div class="container"><article class="case glass glass--light reveal" id="les-senes">
-  <div class="case__img"><img src="assets/img/work/les-senes.jpg" alt="Les Sènes Spa" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/les-senes.webp" alt="Les Sènes Spa" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 01</span>
     <h2>Les Sènes Spa</h2>
@@ -66,10 +69,10 @@
       <div><dt>ما نفذناه</dt><dd>تقرير مالي وإعلاني يفصل مبيعات المركز عن محادثات Meta؛ دليل تواصل وقوالب يربط نوايا العميل بالحجز ويحدد تصعيد الحالات.</dd></div>
       <div><dt>المخرجات</dt><dd>تقرير من 9 صفحات؛ دليل تواصل من 30 صفحة؛ تعريفات موحدة لمسار المحادثة والحجز والحضور والقياس.</dd></div>
     </dl>
-    <div class="stats"><div><b class="hi">1,032,146</b><span>ريال إجمالي مبيعات المركز</span></div><div><b class="">38,167</b><span>ريال إنفاق Meta</span></div><div><b class="">2,747</b><span>محادثة</span></div><div><b class="">13.89</b><span>ريال متوسط تكلفة المحادثة</span></div><div class="src">JAN–JUL 2026 · SOURCE: META & FRESHA</div></div><p class="reading">قراءة الأرقام: المبيعات إجمالي نشاط المركز، ولا تُنسب إلى الإعلان وحده.</p>
+    <div class="stats"><div><b class="hi">1,032,146</b><span>ريال إجمالي مبيعات المركز</span></div><div><b class="">38,167</b><span>ريال إنفاق Meta</span></div><div><b class="">2,747</b><span>محادثة</span></div><div><b class="">13.89</b><span>ريال متوسط تكلفة المحادثة</span></div><div class="src">JAN–JUL 2026 · SOURCE: META &amp; FRESHA</div></div><p class="reading">قراءة الأرقام: المبيعات إجمالي نشاط المركز، ولا تُنسب إلى الإعلان وحده.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="beautiful-shine">
-  <div class="case__img"><img src="assets/img/work/beautiful-shine.jpg" alt="Beautiful Shine" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/beautiful-shine.webp" alt="Beautiful Shine" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 02</span>
     <h2>Beautiful Shine</h2>
@@ -83,7 +86,7 @@
     <div class="stats"><div><b class="">17,920.80</b><span>متوسط المبيعات الشهري · خط الأساس (يناير–يوليو 2025)</span></div><div><b class="">29,168.60</b><span>المرحلة الأولى من الإدارة · +62.8%</span></div><div><b class="hi">40,937.23</b><span>مرحلة ركاز · +128.4%</span></div><div><b class="">2,854</b><span>محادثة Meta بإنفاق 29,032.46 ريال · 10.17 ريال للمحادثة</span></div><div class="src">MONTHLY AVERAGE SALES · SAR</div></div><p class="reading">قراءة الأرقام: مرحلة ركاز (01-05-2026 حتى 29-07-2026) فترة جزئية تقارب 3 أشهر. تعكس المقارنة أثر فترة الإدارة كاملة، ولا تنسب النمو إلى الإعلان وحده.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="cryo">
-  <div class="case__img"><img src="assets/img/work/cryo.jpg" alt="CRYO Infinity Jeddah" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/cryo.webp" alt="CRYO Infinity Jeddah" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 03</span>
     <h2>CRYO Infinity Jeddah</h2>
@@ -97,7 +100,7 @@
     <div class="stats"><div><b class="">407</b><span>مشاهدات لملف Google</span></div><div><b class="">248</b><span>تفاعلًا على الملف</span></div><div><b class="hi">23,176.52</b><span>ريال مبيعات Fresha شاملة الضريبة (20,153.50 صافي)</span></div><div class="src">JULY 2026 · OPERATING PLATFORMS</div></div><p class="reading">أرقام يوليو 2026 من منصات التشغيل، ولا تُنسب المبيعات كلها إلى الإعلان. التطوير المتقدم ثنائي اللغة جزء من خطة المرحلة التالية.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="bud-studio">
-  <div class="case__img"><img src="assets/img/work/bud-studio.jpg" alt="BU’D Studio" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/bud-studio.webp" alt="BU’D Studio" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 04</span>
     <h2>BU’D Studio</h2>
@@ -111,7 +114,7 @@
     <p class="reading">طبيعة النتائج: مخرج نوعي في التموضع وطريقة عرض الأعمال.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="sandouka">
-  <div class="case__img"><img src="assets/img/work/sandouka.jpg" alt="Sandouka Coffee" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/sandouka.webp" alt="Sandouka Coffee" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 05</span>
     <h2>Sandouka Coffee</h2>
@@ -125,7 +128,7 @@
     <p class="reading">نطاق العمل: مشروع علامة وهوية؛ لم يشمل الموقع أو إدارة الإعلانات.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="osus">
-  <div class="case__img"><img src="assets/img/work/osus.jpg" alt="OSUS Events" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/osus.webp" alt="OSUS Events" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 06</span>
     <h2>OSUS Events</h2>
@@ -139,7 +142,7 @@
     <div class="stats"><div><b class="hi">12</b><span>عميلًا مؤسسيًا تعاقدت معهم OSUS خلال فترة العمل، من بينهم flynas</span></div></div><p class="reading">flynas عميل لشركة OSUS وليس عميلًا مباشرًا لـ MKN؛ والتعاقدات نتاج عمل OSUS التجاري الذي دعمته العلامة والحضور، ولا تُنسب كلها إلى الإعلانات.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="imperio">
-  <div class="case__img"><img src="assets/img/work/imperio.jpg" alt="Imperio Events" loading="lazy"></div>
+  <div class="case__img"><img src="assets/img/work/imperio.webp" alt="Imperio Events" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 07</span>
     <h2>Imperio Events</h2>
@@ -153,7 +156,7 @@
     <p class="reading">طبيعة النتائج: مخرج علامة نوعي.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="mireva">
-  <div class="case__img case__img--wide"><img src="assets/img/work/mireva.jpg" alt="Mireva Group / Mireva AI" loading="lazy"></div>
+  <div class="case__img case__img--wide"><img src="assets/img/work/mireva.webp" alt="Mireva Group / Mireva AI" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 08</span>
     <h2>Mireva Group / Mireva AI</h2>
@@ -167,7 +170,7 @@
     <p class="reading">مرحلة المشروع: بناء واختبار. التحليل أداة مساعدة وليس تشخيصًا طبيًا.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="restaurant-ops">
-  <div class="case__img case__img--wide"><img src="assets/img/work/restaurant-ops.jpg" alt="MKN Restaurant Operations / Delivery" loading="lazy"></div>
+  <div class="case__img case__img--wide"><img src="assets/img/work/restaurant-ops.webp" alt="MKN Restaurant Operations / Delivery" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 09</span>
     <h2>MKN Restaurant Operations / Delivery</h2>
@@ -181,7 +184,7 @@
     <p class="reading">مرحلة المنتج: نموذج تطوير قابل للتخصيص؛ النشر على خادم إنتاج وتعدد المستخدمين يُبنى حسب احتياج كل مؤسسة.</p>
   </div>
 </article><article class="case glass glass--light reveal" id="kyan">
-  <div class="case__img case__img--wide"><img src="assets/img/work/kyan.jpg" alt="Kyan Real Estate" loading="lazy"></div>
+  <div class="case__img case__img--wide"><img src="assets/img/work/kyan.webp" alt="Kyan Real Estate" loading="lazy"></div>
   <div>
     <span class="label">SELECTED WORK · CASE 10</span>
     <h2>Kyan Real Estate</h2>
@@ -216,18 +219,18 @@
   <div class="container">
     <div class="footer__grid">
       <div>
-        <a href="index.html" class="logo"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="101" height="34"></a>
+        <a href="index.html" class="logo"><img src="assets/img/logo-white-sm.png" alt="MKN ARABIA" width="101" height="34"></a>
         <p>شريك استراتيجي لنمو الأعمال. نربط الاستراتيجية والإبداع والأداء والتكنولوجيا حول هدف تجاري واحد.</p>
         <p class="slogan">سوّق بالعربي، سوّق صح</p>
         <div class="badge footer-badge" aria-hidden="true">
   <svg viewBox="0 0 120 120"><defs><path id="bpfooter-badge" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs>
-  <text><textPath href="#bpfooter-badge">MKN ARABIA · MARKETING AGENCY · MKN ARABIA · MARKETING AGENCY · </textPath></text></svg>
+  <text direction="ltr"><textPath href="#bpfooter-badge" textLength="286" lengthAdjust="spacing">MKN ARABIA · MARKETING AGENCY · </textPath></text></svg>
   <img src="assets/img/mark-white.png" alt="" width="50" height="50">
 </div>
       </div>
-      <div><h4>الأقسام</h4><ul><li><a href="services.html#d01"><span class="ltr">D01</span> · الاستراتيجية وتخطيط النمو</a></li><li><a href="services.html#d02"><span class="ltr">D02</span> · العلامة والهوية</a></li><li><a href="services.html#d03"><span class="ltr">D03</span> · المحتوى والإنتاج الإبداعي</a></li><li><a href="services.html#d04"><span class="ltr">D04</span> · الإعلانات المدفوعة</a></li><li><a href="services.html#d05"><span class="ltr">D05</span> · المواقع والمتاجر</a></li><li><a href="services.html#d06"><span class="ltr">D06</span> · البحث والقياس</a></li><li><a href="services.html#d07"><span class="ltr">D07</span> · CRM والأتمتة و AI</a></li><li><a href="services.html#d08"><span class="ltr">D08</span> · الأنظمة المخصصة و SaaS</a></li></ul></div>
+      <div><h2 class="fh">الأقسام</h2><ul><li><a href="services.html#d01"><span class="ltr">D01</span> · الاستراتيجية وتخطيط النمو</a></li><li><a href="services.html#d02"><span class="ltr">D02</span> · العلامة والهوية</a></li><li><a href="services.html#d03"><span class="ltr">D03</span> · المحتوى والإنتاج الإبداعي</a></li><li><a href="services.html#d04"><span class="ltr">D04</span> · الإعلانات المدفوعة</a></li><li><a href="services.html#d05"><span class="ltr">D05</span> · المواقع والمتاجر</a></li><li><a href="services.html#d06"><span class="ltr">D06</span> · البحث والقياس</a></li><li><a href="services.html#d07"><span class="ltr">D07</span> · CRM والأتمتة و AI</a></li><li><a href="services.html#d08"><span class="ltr">D08</span> · الأنظمة المخصصة و SaaS</a></li></ul></div>
       <div>
-        <h4>الشركة</h4>
+        <h2 class="fh">الشركة</h2>
         <ul>
           <li><a href="about.html">من نحن</a></li>
           <li><a href="work.html">أعمال مختارة</a></li>
@@ -238,10 +241,10 @@
         </ul>
       </div>
       <div>
-        <h4>تواصل</h4>
+        <h2 class="fh">تواصل</h2>
         <ul>
           <li><a href="#" data-wa><span class="ltr">+20 114 055 2627</span></a></li>
-          <li><a data-email href="#"></a></li>
+          <li><a data-email href="mailto:contact@mknarabia.com">contact@mknarabia.com</a></li>
           <li><a href="https://instagram.com/mknarabia" target="_blank" rel="noopener"><span class="ltr">@mknarabia</span> · Instagram</a></li>
           <li><a href="https://facebook.com/mknarabia" target="_blank" rel="noopener"><span class="ltr">@mknarabia</span> · Facebook</a></li>
           <li><a href="https://linkedin.com/company/mknarabia" target="_blank" rel="noopener">LinkedIn</a></li>
@@ -254,7 +257,7 @@
     </div>
   </div>
 </footer>
-<a class="wa-float" data-wa href="#" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.4-.5.3-.5v-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.4 13.4 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4ZM12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.9 9.9 0 1 1 12 21.8Zm8.4-18.3A11.8 11.8 0 0 0 1.8 17.7L.1 24l6.4-1.7a11.8 11.8 0 0 0 5.6 1.4 11.8 11.8 0 0 0 8.3-20.2Z"/></svg></a>
-<script src="assets/js/main.js"></script>
+<aside aria-label="تواصل سريع"><a class="wa-float" data-wa href="#" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.4-.5.3-.5v-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.4 13.4 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4ZM12 21.8a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.9 9.9 0 1 1 12 21.8Zm8.4-18.3A11.8 11.8 0 0 0 1.8 17.7L.1 24l6.4-1.7a11.8 11.8 0 0 0 5.6 1.4 11.8 11.8 0 0 0 8.3-20.2Z"/></svg></a></aside>
+<script src="assets/js/main.js" defer></script>
 </body>
 </html>
