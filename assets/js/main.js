@@ -1,8 +1,8 @@
 /* MKN Arabia — main script */
 (function () {
   // ===== إعدادات التواصل — عدّلها هنا =====
-  var WHATSAPP_NUMBER = "962700000000"; // رقم واتساب بالصيغة الدولية بدون + أو 00
-  var EMAIL = "info@mknarabia.com";
+  var WHATSAPP_NUMBER = "201140552627"; // رقم واتساب بالصيغة الدولية بدون + أو 00
+  var EMAIL = "contact@mknarabia.com";
 
   // Header on scroll
   var header = document.querySelector(".header");
@@ -48,7 +48,7 @@
 
   // WhatsApp / email links
   document.querySelectorAll("[data-wa]").forEach(function (el) {
-    var msg = el.getAttribute("data-wa") || "مرحباً MKN Arabia، أرغب بالاستفسار عن خدماتكم";
+    var msg = el.getAttribute("data-wa") || "مرحباً MKN ARABIA، أرغب بالاستفسار عن خدماتكم";
     el.setAttribute("href", "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg));
     el.setAttribute("target", "_blank");
     el.setAttribute("rel", "noopener");
@@ -58,6 +58,25 @@
     if (!el.textContent.trim()) el.textContent = EMAIL;
   });
 
+  // Pricing tabs
+  var tabs = document.querySelectorAll("[role=tab]");
+  function selectTab(t) {
+    tabs.forEach(function (x) {
+      var on = x === t;
+      x.setAttribute("aria-selected", on ? "true" : "false");
+      x.tabIndex = on ? 0 : -1;
+      var p = document.getElementById(x.getAttribute("aria-controls"));
+      if (p) p.hidden = !on;
+    });
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () { selectTab(t); });
+  });
+  if (tabs.length && location.hash) {
+    var target = document.querySelector('[role=tab][data-key="' + location.hash.slice(1) + '"]');
+    if (target) selectTab(target);
+  }
+
   // Contact form -> WhatsApp message
   var form = document.getElementById("contact-form");
   if (form) {
@@ -65,15 +84,16 @@
       ev.preventDefault();
       var d = new FormData(form);
       var lines = [
-        "طلب جديد من موقع MKN Arabia",
+        "طلب جديد من موقع MKN ARABIA",
         "الاسم: " + (d.get("name") || ""),
         "الشركة: " + (d.get("company") || "-"),
         "الهاتف: " + (d.get("phone") || ""),
         "البريد: " + (d.get("email") || "-"),
         "الدولة: " + (d.get("country") || ""),
-        "الخدمة: " + (d.get("service") || ""),
-        "الميزانية الشهرية: " + (d.get("budget") || "-"),
-        "التفاصيل: " + (d.get("message") || "-")
+        "القسم المطلوب: " + (d.get("service") || ""),
+        "الموعد المتوقع: " + (d.get("timing") || "-"),
+        "الميزانية: " + (d.get("budget") || "-"),
+        "الهدف والأصول المتاحة: " + (d.get("message") || "-")
       ];
       var url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lines.join("\n"));
       window.open(url, "_blank", "noopener");
