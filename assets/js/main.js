@@ -46,10 +46,12 @@
     el.textContent = new Date().getFullYear();
   });
 
-  // WhatsApp / email links
+  // WhatsApp / email links — every message carries the visit source (UTM) as a reference line
+  function srcRef() { return window.MKN ? "\n\n— مرجع: " + window.MKN.ref() : ""; }
+  function waUrl(msg) { return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg + srcRef()); }
   document.querySelectorAll("[data-wa]").forEach(function (el) {
     var msg = el.getAttribute("data-wa") || "مرحباً MKN ARABIA، أرغب بالاستفسار عن خدماتكم";
-    el.setAttribute("href", "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg));
+    el.setAttribute("href", waUrl(msg));
     el.setAttribute("target", "_blank");
     el.setAttribute("rel", "noopener");
   });
@@ -95,6 +97,13 @@
         "الميزانية: " + (d.get("budget") || "-"),
         "الهدف والأصول المتاحة: " + (d.get("message") || "-")
       ];
+      var a = window.MKN ? window.MKN.attribution() : {};
+      lines.push("", "— المصدر: " + [a.utm_source, a.utm_medium, a.utm_campaign, a.utm_content].filter(Boolean).join(" / "),
+                 "— صفحة الدخول: " + (a.landing_page || location.pathname));
+      if (window.MKN) window.MKN.track("generate_lead", {
+        form_id: "contact", method: "whatsapp", department: d.get("service") || "", market: d.get("country") || "",
+        budget_range: d.get("budget") || "", timing: d.get("timing") || "", content_name: d.get("service") || ""
+      });
       var url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lines.join("\n"));
       window.open(url, "_blank", "noopener");
       var ok = document.querySelector(".form-success");
