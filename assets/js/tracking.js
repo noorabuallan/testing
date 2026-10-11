@@ -82,13 +82,15 @@
     };
   }
 
-  /* short human-readable reference appended to WhatsApp messages */
+  /* short source code appended to WhatsApp messages — only for tracked visits (campaign, search, social, referral);
+     direct visits add nothing, so the visitor never sees technical text like "(direct) / (none)" */
   function ref() {
+    if (!last) return "";
     var a = attribution();
     var parts = [a.utm_source, a.utm_medium];
     if (a.utm_campaign) parts.push(a.utm_campaign);
     if (a.utm_content) parts.push(a.utm_content);
-    return parts.join(" / ") + " · " + location.pathname;
+    return parts.join("/");
   }
 
   /* ---------- loaders ---------- */
