@@ -12,6 +12,7 @@
 | `about.html` | المسار، الرؤية والرسالة، القيم الست، التركيز السوقي، القيادة، المنهجية، المسؤوليات، القياس |
 | `contact.html` | بيانات التواصل، نموذج يرسل الطلب على واتساب، خطوات البدء، الأسئلة الثمانية |
 | `insights.html` + `insights/*.html` | المقالات (3 مقالات عربية) |
+| `testimonials.html` | آراء العملاء حسب الدولة |
 | `privacy.html` | سياسة الخصوصية وأدوات القياس |
 | `utm.html` | أداة داخلية لإنشاء روابط الحملات (غير ظاهرة في القائمة) |
 
@@ -40,5 +41,13 @@
 python3 -m http.server 8000
 ```
 
-## النشر
-يعمل مباشرة على GitHub Pages أو Netlify أو Vercel أو أي استضافة، ويمكن ربطه بالنطاق `mknarabia.com`.
+## النشر على Hostinger (mknarabia.com)
+**الطريقة الأسهل — Git من لوحة Hostinger:**
+1. ادمج طلب الدمج في الفرع الرئيسي على GitHub.
+2. hPanel ← Websites ← mknarabia.com ← Advanced ← **Git**.
+3. Repository: `https://github.com/noorabuallan/testing.git` — Branch: `master` — Directory: اتركه فارغًا (`public_html`).
+4. اضغط Deploy، وفعّل Auto Deployment ليتحدث الموقع مع كل تعديل.
+
+**أو يدويًا:** File Manager ← `public_html` ← ارفع كل الملفات والمجلدات (`index.html` وبقية الصفحات، `assets/`، `insights/`، `.htaccess`، `robots.txt`، `sitemap.xml`).
+
+بعد النشر: فعّل SSL المجاني من hPanel ← Security ← SSL. ملف `.htaccess` يحوّل كل الزيارات إلى `https://mknarabia.com` ويفعّل الضغط والتخزين المؤقت.

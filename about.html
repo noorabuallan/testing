@@ -17,10 +17,7 @@
 <link rel="icon" href="assets/img/favicon-48.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <script src="assets/js/tracking.js" defer></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="preload" as="image" href="assets/img/brand/diffusion-dark.webp" type="image/webp">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -125,10 +122,10 @@
 <section class="section section--cream" id="founder">
   <svg class="grid-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="30" y1="0" x2="30" y2="100"/><line x1="70" y1="0" x2="70" y2="100"/><line x1="0" y1="50" x2="100" y2="50"/><line x1="30" y1="0" x2="70" y2="100"/><line x1="70" y1="0" x2="30" y2="100"/></svg>
   <div class="container founder">
-    <div class="founder__card reveal">
-      <img src="assets/img/logo-dark-sm.png" alt="" style="height:30px;width:auto;align-self:flex-start" width="89" height="30">
+    <div class="founder__card founder__card--photo reveal">
+      <img class="founder__photo" src="assets/img/brand/founder.webp" alt="نور الدين أبو علّان — المؤسس والرئيس التنفيذي لـ MKN ARABIA" width="640" height="714" loading="lazy">
       <div class="glass">
-        <span class="label" style="color:var(--ink)">FOUNDER &amp; MANAGING DIRECTOR</span>
+        <span class="label" style="color:var(--ink)">CEO &amp; FOUNDER</span>
         <h3>نور الدين أبو علّان</h3>
         <div class="en">NOUREDDIN ABUALLAN</div>
       </div>
@@ -140,7 +137,7 @@
       <p style="font-size:17px">يقود نور الدين أعمال MKN ARABIA في الاستراتيجية وإدارة المشاريع والنمو الرقمي، مع التركيز على تصميم أنظمة متكاملة تجمع المحتوى والإعلانات والمواقع والتحليلات واحتياجات التشغيل في أسواق الخليج والمنطقة.</p>
       <div class="hero__actions" style="margin-top:24px">
         <a href="https://calendar.app.google/kJDTjHQZmPZWF2Db7" target="_blank" rel="noopener" data-book class="btn btn--blue">احجز جلسة تعريفية</a>
-        <a href="about.html#method" class="btn btn--line">تعرّف على طريقة عملنا</a>
+        <a href="about.html#method" class="btn btn--ghost">تعرّف على طريقة عملنا</a>
       </div>
     </div>
   </div>
@@ -224,6 +221,7 @@
           <li><a href="pricing.html">الباقات وعرض السعر</a></li>
           <li><a href="pricing.html#bundles">الحلول المتكاملة</a></li>
           <li><a href="insights.html">المقالات</a></li>
+          <li><a href="testimonials.html">آراء العملاء</a></li>
           <li><a href="contact.html">ابدأ التعاون</a></li>
           <li><a href="privacy.html">سياسة الخصوصية</a></li>
         </ul>
@@ -241,7 +239,7 @@
       </div>
     </div>
     <div class="footer__bottom">
-      <span>© <span data-year></span> MKN ARABIA. جميع الحقوق محفوظة.</span>
+      <span>© <span data-year></span> MKN ARABIA · الأردن. جميع الحقوق محفوظة.</span>
       <span class="label">STRATEGY · CREATIVE · PERFORMANCE · TECHNOLOGY</span>
     </div>
   </div>
