@@ -1,0 +1,107 @@
+{
+ "les-senes": {
+  "label": "Les Sènes Spa",
+  "tone": "light",
+  "size": [
+   191,
+   113
+  ]
+ },
+ "osus": {
+  "label": "OSUS Events",
+  "tone": "custom",
+  "bg": "#314b48",
+  "size": [
+   360,
+   157
+  ]
+ },
+ "kyan": {
+  "label": "Kyan Real Estate",
+  "tone": "light",
+  "size": [
+   207,
+   170
+  ]
+ },
+ "mireva": {
+  "label": "Mireva Group",
+  "tone": "light",
+  "size": [
+   360,
+   86
+  ]
+ },
+ "aqua": {
+  "label": "Aqua Software",
+  "tone": "light",
+  "size": [
+   225,
+   81
+  ]
+ },
+ "artimal": {
+  "label": "Artimal Gifts",
+  "tone": "light",
+  "size": [
+   154,
+   170
+  ]
+ },
+ "bright-smile": {
+  "label": "Bright Smile Dental",
+  "tone": "light",
+  "size": [
+   156,
+   170
+  ]
+ },
+ "islam-salon": {
+  "label": "Islam Salon",
+  "tone": "light",
+  "size": [
+   196,
+   170
+  ]
+ },
+ "mix-grill": {
+  "label": "Mix Grill",
+  "tone": "light",
+  "size": [
+   122,
+   119
+  ]
+ },
+ "tabiq-lahem": {
+  "label": "Tabiq Lahem",
+  "tone": "light",
+  "size": [
+   193,
+   170
+  ]
+ },
+ "ayoub": {
+  "label": "Ayoub Dental Clinic",
+  "tone": "light",
+  "size": [
+   99,
+   124
+  ]
+ },
+ "fitness-times": {
+  "label": "Fitness Times",
+  "tone": "dark",
+  "size": [
+   152,
+   170
+  ]
+ },
+ "reem-shawarma": {
+  "label": "Reem Shawarma",
+  "tone": "dark",
+  "size": [
+   153,
+   135
+  ]
+ }
+}
