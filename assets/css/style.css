@@ -955,3 +955,15 @@ body.wa-hide .wa-float { opacity: 0; transform: translateY(90px); pointer-events
 @media (max-width: 640px) { .case__img:not(.case__img--wide) { aspect-ratio: 1 / 1; } .case__img:not(.case__img--wide) img { object-position: center 25%; } }
 @media (prefers-reduced-motion: reduce) and (max-width: 640px) { .logo-track { padding-inline: 16px; } .logo-track .ltile { width: calc(33.333% - 10px); height: 64px; padding: 8px; margin-inline-end: 8px; } .logo-track .ltile img { max-height: 40px; } }
 .nav .nav__wa { color: #fff; border-color: rgba(255,255,255,.35); }
+/* logos supplied as full artwork (e.g. E SPA): fill the tile instead of the usual inner padding */
+.ltile--fill { padding: 6px; }
+.ltile--fill img { max-height: 92px; }
+.logo-wall .ltile--fill img { max-height: 80px; }
+.tcard figcaption .tlogo--fill { padding: 2px; }
+@media (max-width: 640px) {
+  .ltile--fill img { max-height: 74px; }
+  .logo-wall .ltile--fill { padding: 4px; }
+  .logo-wall .ltile--fill img { max-height: 60px; }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 640px) { .logo-track .ltile--fill img { max-height: 56px; } }
+@media (min-width: 641px) { .logo-wall { grid-template-columns: repeat(5, 1fr); } }

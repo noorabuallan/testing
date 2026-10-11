@@ -24,6 +24,18 @@
    170
   ]
  },
+ "e-spa": {
+  "label": "E SPA Dubai",
+  "tone": "custom",
+  "bg": "#fff2ec",
+  "size": [
+   274,
+   240
+  ],
+  "fit": "fill",
+  "clip": "circle(65.9% at 52.56% 62.59%)",
+  "approved": "2026-10-11 · exact uploaded image (approved/E_SPA_APPROVED_Original.png); dark screenshot corners hidden by CSS clip only"
+ },
  "mireva": {
   "label": "Mireva Group",
   "tone": "light",
@@ -31,6 +43,16 @@
    360,
    86
   ]
+ },
+ "imperio": {
+  "label": "Imperio Events",
+  "tone": "custom",
+  "bg": "#2a0403",
+  "size": [
+   360,
+   106
+  ],
+  "approved": "2026-10-11 · official wordmark from company profile p.37 (approved/IMPERIO_Approved_Wordmark.png)"
  },
  "aqua": {
   "label": "Aqua Software",
