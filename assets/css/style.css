@@ -614,3 +614,9 @@ a.cell:hover .go { transform: scale(1); opacity: 1; }
 .tquote figcaption b { display: block; font-size: 15px; }
 .tquote figcaption span { font-size: 13px; color: var(--muted); }
 .founder__card--photo { justify-content: flex-end; }
+@media (max-width: 640px) {
+  .windex a { grid-template-columns: 34px 1fr; gap: 2px 12px; padding: 14px 8px; }
+  .windex span.s { grid-column: 2; font-size: 13px; }
+  .windex strong { font-size: 17px; }
+}
+.windex strong { text-align: right; }
