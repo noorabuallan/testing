@@ -19,32 +19,36 @@
 <script src="assets/js/tracking.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="header">
-  <div class="container header__inner">
-    <a href="index.html" class="logo" aria-label="MKN ARABIA — الرئيسية"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="112" height="38"></a>
+  <div class="container"><div class="header__inner">
+    <a href="index.html" class="logo" aria-label="MKN ARABIA — الرئيسية"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="101" height="34"></a>
     <nav class="nav" aria-label="القائمة الرئيسية">
       <a href="index.html">الرئيسية</a><a href="services.html">الخدمات</a><a href="pricing.html">الباقات</a><a href="work.html">أعمالنا</a><a href="about.html">من نحن</a><a href="contact.html" class="active" aria-current="page">تواصل</a>
       <a href="#" data-wa class="btn btn--blue btn--sm">ابدأ محادثة</a>
     </nav>
     <button class="nav-toggle" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
-  </div>
+  </div></div>
 </header>
 <main>
-<section class="page-hero"><div class="container">
-  <span class="label">LET'S START</span>
-  <h1>ابدأ التعاون.</h1>
-  <p>لترتيب عرض، أرسل الحاجة والسوق والموعد والميزانية والأصول المتاحة. نراجع الاحتياج ونوصي بنطاق واضح.</p>
-</div></section>
-<section class="section">
+<section class="page-hero grain">
+  <svg class="grid-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="14" y1="0" x2="14" y2="100"/><line x1="86" y1="0" x2="86" y2="100"/><line x1="0" y1="30" x2="100" y2="30"/><line x1="0" y1="70" x2="100" y2="70"/><line x1="14" y1="0" x2="86" y2="100"/></svg>
+  <div class="container">
+    <span class="label">LET'S START</span>
+    <h1>ابدأ التعاون.</h1>
+    <p>لترتيب عرض، أرسل الحاجة والسوق والموعد والميزانية والأصول المتاحة. نراجع الاحتياج ونوصي بنطاق واضح.</p>
+    <span class="chip"><span class="dot"></span>سوّق بالعربي، سوّق صح</span>
+  </div>
+</section>
+<section class="section section--diff-l">
   <div class="container contact-grid">
     <div class="reveal">
       <span class="label">CONTACT</span>
       <h2 style="font-size:34px;margin:12px 0 18px">تواصل مباشرة.</h2>
-      <div class="cinfo">
+      <div class="cinfo glass glass--light">
         <a href="#" data-wa><span class="label">WHATSAPP</span><b>+20 114 055 2627</b></a>
         <a data-email href="#" aria-label="البريد الإلكتروني"><span class="label">EMAIL</span><b>contact@mknarabia.com</b></a>
         <a href="https://mknarabia.com"><span class="label">WEBSITE</span><b>mknarabia.com</b></a>
@@ -55,7 +59,7 @@
       <p class="reading">مستوى الرد والدعم وأوقات التواصل يثبت في الاتفاق.</p>
     </div>
 
-    <form class="form reveal" id="contact-form">
+    <form class="form glass glass--light reveal" id="contact-form">
       <span class="label">PROJECT BRIEF</span>
       <h3 style="margin-top:8px">أرسل تفاصيل مشروعك</h3>
       <p class="muted" style="font-size:15px">يصلنا الطلب مباشرة على واتساب مرتبًا.</p>
@@ -98,7 +102,7 @@
   </div>
 </section>
 
-<section class="section">
+<section class="section section--aura">
   <div class="container" style="max-width:900px">
     <div class="heading">
       <span class="label">08 QUESTIONS · CLEAR ANSWERS</span>
@@ -109,12 +113,18 @@
 </section>
 </main>
 <footer class="footer">
+  <img class="footer__mark" src="assets/img/logo-white.png" alt="" width="620" height="210" loading="lazy">
   <div class="container">
     <div class="footer__grid">
       <div>
         <a href="index.html" class="logo"><img src="assets/img/logo-white.png" alt="MKN ARABIA" width="101" height="34"></a>
         <p>شريك استراتيجي لنمو الأعمال. نربط الاستراتيجية والإبداع والأداء والتكنولوجيا حول هدف تجاري واحد.</p>
         <p class="slogan">سوّق بالعربي، سوّق صح</p>
+        <div class="badge footer-badge" aria-hidden="true">
+  <svg viewBox="0 0 120 120"><defs><path id="bpfooter-badge" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs>
+  <text><textPath href="#bpfooter-badge">MKN ARABIA · MARKETING AGENCY · MKN ARABIA · MARKETING AGENCY · </textPath></text></svg>
+  <img src="assets/img/mark-white.png" alt="" width="50" height="50">
+</div>
       </div>
       <div><h4>الأقسام</h4><ul><li><a href="services.html#d01"><span class="ltr">D01</span> · الاستراتيجية وتخطيط النمو</a></li><li><a href="services.html#d02"><span class="ltr">D02</span> · العلامة والهوية</a></li><li><a href="services.html#d03"><span class="ltr">D03</span> · المحتوى والإنتاج الإبداعي</a></li><li><a href="services.html#d04"><span class="ltr">D04</span> · الإعلانات المدفوعة</a></li><li><a href="services.html#d05"><span class="ltr">D05</span> · المواقع والمتاجر</a></li><li><a href="services.html#d06"><span class="ltr">D06</span> · البحث والقياس</a></li><li><a href="services.html#d07"><span class="ltr">D07</span> · CRM والأتمتة و AI</a></li><li><a href="services.html#d08"><span class="ltr">D08</span> · الأنظمة المخصصة و SaaS</a></li></ul></div>
       <div>

@@ -41,6 +41,17 @@
     items.forEach(function (el) { el.classList.add("in"); });
   }
 
+  // Glass spotlight: light follows the pointer on glass cards (desktop only)
+  if (window.matchMedia && window.matchMedia("(hover: hover)").matches) {
+    document.addEventListener("pointermove", function (ev) {
+      var el = ev.target.closest && ev.target.closest(".spot");
+      if (!el) return;
+      var r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", (ev.clientX - r.left) + "px");
+      el.style.setProperty("--my", (ev.clientY - r.top) + "px");
+    }, { passive: true });
+  }
+
   // Current year
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
