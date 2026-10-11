@@ -175,6 +175,11 @@
       track("quote_request", { package_id: a.getAttribute("data-quote"), content_name: a.getAttribute("data-quote-name") || "",
                                department: a.getAttribute("data-dept") || "", method: "whatsapp", link_location: loc });
     }
+    // booking link clicks (a click is NOT a confirmed booking — the booking itself happens on Google Calendar)
+    if (a.hasAttribute("data-book") || /calendar\.app\.google|calendar\.google\.com\/calendar\/appointments/i.test(href)) {
+      track("booking_click", { link_location: loc, link_text: txt(a) });
+      return;
+    }
     if (a.hasAttribute("data-wa") || /wa\.me|whatsapp/i.test(href)) {
       track("whatsapp_click", { link_location: loc, link_text: txt(a), content_name: a.getAttribute("data-quote-name") || "" });
     } else if (/^mailto:/i.test(href) || a.hasAttribute("data-email")) {

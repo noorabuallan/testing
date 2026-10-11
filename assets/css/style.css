@@ -563,3 +563,28 @@ a.cell:hover .go { transform: scale(1); opacity: 1; }
 .footer__mark { aspect-ratio: 355 / 120; }
 .fh { color: #fff; font-size: 15px; margin-bottom: 16px; }
 .ftable-wrap:focus-visible { outline-offset: 4px; }
+
+/* ---- content pack additions ---- */
+.quote { margin: 18px 0 18px; padding: 4px 18px 4px 0; border-inline-start: 3px solid var(--sky); font-size: clamp(18px, 1.8vw, 22px); line-height: 1.7; font-weight: 500; }
+.section--dark .quote { color: #fff; }
+.section--dark .founder p { color: #c4ced3; }
+.icard { display: flex; flex-direction: column; }
+.icard h3 { font-size: 19px; line-height: 1.5; }
+.icard p { flex: 1; }
+.icard .more { margin-top: 18px; font-weight: 600; font-size: 15px; color: var(--sky-ink); }
+.icard .more::after { content: " ←"; font-family: var(--mono); }
+.prose { max-width: 820px; margin-inline: auto; padding: clamp(24px, 5vw, 56px); border-radius: 28px; font-size: 18px; line-height: 2; }
+.prose .lead-p { font-size: 20px; font-weight: 500; color: var(--ink); }
+.prose h2 { font-size: clamp(22px, 2.4vw, 28px); margin: 36px 0 10px; }
+.prose p { color: #2b3338; }
+.prose-cta { margin-top: 40px; padding: 26px; border-radius: 20px; background: var(--ink) url(../img/brand/diffusion-dark.webp) center / cover; color: #fff; }
+.prose-cta p { color: #fff; font-weight: 600; font-size: 19px; }
+.prose-cta .btn--dark { background: var(--sky); color: var(--ink); }
+.prose-cta .btn--ghost { color: #fff; border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+.booking { padding: 10px; border-radius: 24px; background: rgba(255,255,255,.92) !important; }
+.booking iframe { display: block; width: 100%; height: 640px; border: 0; border-radius: 16px; background: #fff; }
+.checks-d { margin: 18px 0 8px; display: grid; gap: 10px; }
+.checks-d li { position: relative; padding-inline-start: 28px; color: #d3dbe0; }
+.checks-d li::before { content: ""; position: absolute; inset-inline-start: 0; top: 10px; width: 14px; height: 14px; border-radius: 4px; background: var(--sky); box-shadow: 0 0 0 4px rgba(75,181,214,.2); }
+.hero h1 { font-size: clamp(36px, 4.8vw, 66px); }
+@media (max-width: 1180px) { .nav a { padding: 8px 9px; font-size: 14px; } }
