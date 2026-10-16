@@ -49,7 +49,18 @@ add_action( 'init', function () {
 		'menu_icon'     => 'dashicons-email-alt',
 		'menu_position' => 25,
 		'supports'      => false,
-		'capabilities'  => array( 'create_posts' => 'do_not_allow' ),
+		// Leads hold visitors' personal details: editors and admins only.
+		'capabilities'  => array(
+			'create_posts'        => 'do_not_allow',
+			'edit_posts'          => 'edit_others_posts',
+			'edit_others_posts'   => 'edit_others_posts',
+			'edit_private_posts'  => 'edit_others_posts',
+			'read_private_posts'  => 'edit_others_posts',
+			'delete_posts'        => 'delete_others_posts',
+			'delete_private_posts' => 'delete_others_posts',
+			'delete_others_posts' => 'delete_others_posts',
+			'publish_posts'       => 'do_not_allow',
+		),
 	) );
 } );
 
@@ -230,6 +241,11 @@ function mkn_fields_box( $post ) {
 		if ( is_string( $opts ) && is_callable( $opts ) ) {
 			$opts = call_user_func( $opts );
 		}
+		if ( 'select' === $type && is_string( $val ) && '' !== $val && ! array_key_exists( $val, (array) $opts ) ) {
+			// Linked item is unpublished or in the trash: keep it selected rather than losing the link on save.
+			$title         = 'logo' === $key ? get_the_title( (int) $val ) : $val;
+			$opts[ $val ] = ( $title ? $title : $val ) . ' (غير منشور)';
+		}
 		echo '<tr><th scope="row"><label for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label></th><td>';
 		switch ( $type ) {
 			case 'textarea':
@@ -304,7 +320,7 @@ add_action( 'save_post', function ( $post_id, $post ) {
 				$v = trim( sanitize_textarea_field( (string) $raw ) );
 				break;
 			case 'select':
-				$v = array_key_exists( (string) $raw, (array) $opts ) ? (string) $raw : '';
+				$v = ( array_key_exists( (string) $raw, (array) $opts ) || ( '' !== (string) $raw && (string) $raw === mkn_meta( $post_id, $key ) ) ) ? (string) $raw : '';
 				break;
 			case 'checkbox':
 				$v = '1' === (string) $raw ? '1' : '';
@@ -331,6 +347,8 @@ foreach ( array( 'mkn_testimonial', 'mkn_case', 'mkn_client', 'mkn_faq' ) as $mk
 	add_action( 'save_post_' . $mkn_type, 'mkn_flush_page_cache' );
 }
 add_action( 'trashed_post', 'mkn_flush_page_cache' );
+add_action( 'delete_attachment', 'mkn_flush_page_cache' );
+add_action( 'edit_attachment', 'mkn_flush_page_cache' );
 add_action( 'untrashed_post', 'mkn_flush_page_cache' );
 
 /** Purge the LiteSpeed (Hostinger) page cache, when present. */
@@ -452,7 +470,7 @@ function mkn_lead_box( $post ) {
 		echo '<tr><th style="width:180px">' . esc_html( $label ) . '</th><td' . $ltr . '>' . nl2br( esc_html( '' !== $v ? $v : '—' ) ) . '</td></tr>';
 	}
 	echo '</tbody></table>';
-	$phone = preg_replace( '/\D+/', '', mkn_meta( $post->ID, 'phone' ) );
+	$phone = preg_replace( '/\D+/', '', mkn_ascii_digits( mkn_meta( $post->ID, 'phone' ) ) );
 	$email = mkn_meta( $post->ID, 'email' );
 	echo '<p style="margin-top:14px">';
 	if ( $phone ) {
@@ -472,8 +490,17 @@ add_action( 'load-post.php', function () {
 	}
 } );
 
+/** Can the current user read the website leads? */
+function mkn_can_see_leads() {
+	$type = get_post_type_object( 'mkn_lead' );
+	return $type && current_user_can( $type->cap->read_private_posts );
+}
+
 /** Number of leads not opened yet. */
 function mkn_new_leads() {
+	if ( ! mkn_can_see_leads() ) {
+		return 0;
+	}
 	$q = new WP_Query( array(
 		'post_type'      => 'mkn_lead',
 		'post_status'    => 'private',
@@ -499,14 +526,14 @@ add_action( 'admin_menu', function () {
 
 /* Leads list: show private posts by default and offer a CSV export. */
 add_action( 'restrict_manage_posts', function ( $type ) {
-	if ( 'mkn_lead' === $type ) {
+	if ( 'mkn_lead' === $type && mkn_can_see_leads() ) {
 		$url = wp_nonce_url( admin_url( 'admin-post.php?action=mkn_leads_csv' ), 'mkn_leads_csv' );
 		echo '<a class="button" href="' . esc_url( $url ) . '">تصدير CSV</a>';
 	}
 } );
 
 add_action( 'admin_post_mkn_leads_csv', function () {
-	if ( ! current_user_can( 'edit_posts' ) || ! check_admin_referer( 'mkn_leads_csv' ) ) {
+	if ( ! mkn_can_see_leads() || ! check_admin_referer( 'mkn_leads_csv' ) ) {
 		wp_die( 'غير مسموح.' );
 	}
 	$leads = get_posts( array( 'post_type' => 'mkn_lead', 'post_status' => 'private', 'posts_per_page' => -1, 'orderby' => 'date', 'order' => 'DESC' ) );

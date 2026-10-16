@@ -34,32 +34,50 @@ function mkn_settings_defaults() {
 	return $d;
 }
 
-/** One site setting (saved value, or the shipped default when empty). */
+/** Settings that must always have a value (an emptied field falls back to the shipped default). */
+function mkn_required_settings() {
+	return array( 'whatsapp', 'email', 'book' );
+}
+
+/**
+ * One site setting. Required settings fall back to the shipped default when empty; any other field the
+ * owner has saved is used as saved, so emptying a social link or the embedded booking removes it.
+ */
 function mkn_opt( $key ) {
 	static $opts = null;
 	if ( null === $opts ) {
 		$saved = get_option( 'mkn_settings', array() );
+		$saved = is_array( $saved ) ? $saved : array();
 		$opts  = mkn_settings_defaults();
-		foreach ( is_array( $saved ) ? $saved : array() as $k => $v ) {
-			if ( array_key_exists( $k, $opts ) && '' !== (string) $v ) {
-				$opts[ $k ] = (string) $v;
-			}
-		}
-		// Tracking IDs have no defaults, so an emptied field must stay empty.
 		foreach ( mkn_settings_fields() as $k => $f ) {
-			if ( 'id' === $f[1] ) {
+			if ( 'id' === $f[1] ) { // tracking IDs have no defaults
 				$opts[ $k ] = isset( $saved[ $k ] ) ? (string) $saved[ $k ] : '';
+			} elseif ( array_key_exists( $k, $saved ) && ( '' !== (string) $saved[ $k ] || ! in_array( $k, mkn_required_settings(), true ) ) ) {
+				$opts[ $k ] = (string) $saved[ $k ];
 			}
 		}
 	}
 	return isset( $opts[ $key ] ) ? $opts[ $key ] : '';
 }
 
-add_action( 'update_option_mkn_settings', function () {
-	if ( function_exists( 'mkn_flush_page_cache' ) ) {
-		mkn_flush_page_cache();
+/** Arabic-Indic and Persian digits typed in phone numbers become 0-9. */
+function mkn_ascii_digits( $s ) {
+	$map = array();
+	foreach ( array( '٠١٢٣٤٥٦٧٨٩', '۰۱۲۳۴۵۶۷۸۹' ) as $set ) {
+		foreach ( preg_split( '//u', $set, -1, PREG_SPLIT_NO_EMPTY ) as $i => $ch ) {
+			$map[ $ch ] = (string) $i;
+		}
 	}
-} );
+	return strtr( (string) $s, $map );
+}
+
+foreach ( array( 'add_option_mkn_settings', 'update_option_mkn_settings' ) as $mkn_hook ) {
+	add_action( $mkn_hook, function () {
+		if ( function_exists( 'mkn_flush_page_cache' ) ) {
+			mkn_flush_page_cache();
+		}
+	} );
+}
 
 function mkn_sanitize_settings( $in ) {
 	$out = array();
@@ -68,7 +86,10 @@ function mkn_sanitize_settings( $in ) {
 		$v = isset( $in[ $k ] ) ? trim( (string) wp_unslash( $in[ $k ] ) ) : '';
 		switch ( $f[1] ) {
 			case 'digits':
-				$v = preg_replace( '/\D+/', '', $v );
+				$v = preg_replace( '/\D+/', '', mkn_ascii_digits( $v ) );
+				if ( '' === $v && 'whatsapp' === $k ) {
+					add_settings_error( 'mkn_settings', 'mkn-whatsapp', 'رقم واتساب غير صحيح؛ أُبقي الرقم الافتراضي.' );
+				}
 				break;
 			case 'email':
 				$v = sanitize_email( $v );
@@ -105,7 +126,6 @@ function mkn_settings_page() {
 	}
 	$saved    = get_option( 'mkn_settings', array() );
 	$saved    = is_array( $saved ) ? $saved : array();
-	$defaults = mkn_settings_defaults();
 	$sections = array(
 		'contact'  => array( 'التواصل والحجز', 'تظهر هذه البيانات في كل صفحات الموقع (الأزرار، التذييل، صفحة التواصل).' ),
 		'social'   => array( 'الحسابات', '' ),
@@ -126,15 +146,16 @@ function mkn_settings_page() {
 					if ( $f[2] !== $sid ) {
 						continue;
 					}
-					$val  = isset( $saved[ $k ] ) && '' !== $saved[ $k ] ? $saved[ $k ] : ( 'id' === $f[1] ? '' : $defaults[ $k ] );
+					$val  = mkn_opt( $k );
 					$type = 'email' === $f[1] ? 'email' : ( 'url' === $f[1] ? 'url' : 'text' );
+					$help = $f[3] . ( in_array( $k, mkn_required_settings(), true ) || 'id' === $f[1] ? '' : ' اتركه فارغًا لإخفائه من الموقع.' );
 					$ltr  = 'text' !== $f[1] || 'wa_display' === $k;
 					?>
 					<tr>
 						<th scope="row"><label for="mkn-<?php echo esc_attr( $k ); ?>"><?php echo esc_html( $f[0] ); ?></label></th>
 						<td>
 							<input name="mkn_settings[<?php echo esc_attr( $k ); ?>]" id="mkn-<?php echo esc_attr( $k ); ?>" type="<?php echo esc_attr( $type ); ?>" value="<?php echo esc_attr( $val ); ?>" class="regular-text<?php echo $ltr ? ' ltr' : ''; ?>"<?php echo $ltr ? ' dir="ltr"' : ''; ?>>
-							<?php if ( $f[3] ) : ?><p class="description"><?php echo esc_html( $f[3] ); ?></p><?php endif; ?>
+							<?php if ( trim( $help ) ) : ?><p class="description"><?php echo esc_html( trim( $help ) ); ?></p><?php endif; ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>

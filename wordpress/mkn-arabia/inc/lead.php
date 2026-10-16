@@ -61,6 +61,7 @@ function mkn_lead_submit( WP_REST_Request $req ) {
 	foreach ( array( 'name' => 120, 'company' => 160, 'phone' => 40, 'email' => 160, 'country' => 80, 'service' => 120, 'timing' => 80, 'budget' => 80, 'message' => 3000, 'ref' => 200, 'landing' => 200 ) as $k => $max ) {
 		$d[ $k ] = mkn_lead_field( $req, $k, $max );
 	}
+	$d['phone'] = mkn_ascii_digits( $d['phone'] );
 	if ( '' === $d['name'] || '' === $d['phone'] ) {
 		return mkn_lead_reply( 422, false );
 	}

@@ -1367,11 +1367,11 @@ for code, cname, en in COUNTRIES:
   <div class="hero__actions"><a {BOOK_A} class="btn btn--dark">احجز استشارة مجانية</a><a href="#" data-wa class="btn btn--ghost">واتساب</a></div>
 </div>"""
 testimonials_page = page_hero("CLIENT VOICES", "آراء العملاء.",
-  f"{TESTI_N} رأيًا من أصحاب أعمال في ست دول عن تجربتهم مع MKN ARABIA. جميع الآراء منشورة بموافقة أصحابها.",
+  f"{TESTI_N} رأيًا من أصحاب أعمال في {'[[countries_phrase]]' if THEME else 'ست دول'} عن تجربتهم مع MKN ARABIA. جميع الآراء منشورة بموافقة أصحابها.",
   actions=True, extra=subnav("testimonials.html")) + logos_rail(sub="مختارات من العلامات التي عملنا معها في المنطقة.") + f"""
 <section class="section section--aura section--jump">
   <div class="container">
-    <nav class="jump jump--6 glass glass--light" aria-label="الدول">{"".join(f'<a href="#{c}"><span class="label">{en}</span>{n}</a>' for c, n, en in COUNTRIES)}</nav>
+    <nav class="jump jump--6 glass glass--light" aria-label="الدول">{"[[testimonial_jump]]" if THEME else "".join(f'<a href="#{c}"><span class="label">{en}</span>{n}</a>' for c, n, en in COUNTRIES)}</nav>
     {"[[testimonial_groups]]" if THEME else groups}
   </div>
 </section>

@@ -79,7 +79,7 @@ add_action( 'wp', function () {
 /** Settings the front-end scripts need (WhatsApp number, email, lead endpoint, tracking IDs). */
 function mkn_js_config() {
 	return array(
-		'wa'       => preg_replace( '/\D+/', '', mkn_opt( 'whatsapp' ) ),
+		'wa'       => preg_replace( '/\D+/', '', mkn_ascii_digits( mkn_opt( 'whatsapp' ) ) ),
 		'email'    => mkn_opt( 'email' ),
 		'leadUrl'  => esc_url_raw( rest_url( 'mkn/v1/lead' ) ),
 		'tracking' => array(

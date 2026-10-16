@@ -73,7 +73,7 @@ add_filter( 'pre_get_document_title', function ( $title ) {
 		return $title;
 	}
 	$m = mkn_seo_meta();
-	return $m['title'] ? $m['title'] : $title;
+	return $m['title'] ? esc_html( $m['title'] ) : $title;
 }, 20 );
 
 add_filter( 'document_title_separator', function () {
@@ -134,7 +134,7 @@ add_action( 'wp_head', function () {
 		$tags[] = '<link rel="canonical" href="' . esc_url( $m['url'] ) . '">';
 	}
 	foreach ( mkn_json_ld() as $ld ) {
-		$tags[] = '<script type="application/ld+json">' . wp_json_encode( $ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>';
+		$tags[] = '<script type="application/ld+json">' . wp_json_encode( $ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>';
 	}
 	echo implode( "\n", $tags ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped above
 }, 2 );

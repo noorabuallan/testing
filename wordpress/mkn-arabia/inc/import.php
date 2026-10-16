@@ -4,19 +4,37 @@ defined( 'ABSPATH' ) || exit;
 /*
  * First-run setup: creates the pages, imports the current site content (articles, testimonials,
  * case studies, client logos with their images, FAQ) and sets permalinks and reading options.
- * Runs once after the theme is activated; safe to run again from «إعدادات MKN ← استيراد المحتوى»
- * — items that already exist are never overwritten, so edits made in the dashboard are kept.
+ * Runs once, on the first request after the theme is activated. «إعدادات MKN ← استيراد المحتوى»
+ * adds anything missing later: items that exist (or were deleted on purpose) are never touched,
+ * and site options are only set on the first run, so edits made in the dashboard are kept.
  */
-
-add_action( 'after_switch_theme', function () {
-	update_option( 'mkn_seed_state', 'pending', true );
-} );
 
 add_action( 'init', function () {
 	if ( 'done' !== get_option( 'mkn_seed_state' ) && ! wp_doing_ajax() && ! wp_installing() ) {
 		mkn_import_run();
 	}
 }, 20 );
+
+/* Items the owner deletes for good are remembered, so a later import does not bring them back. */
+add_action( 'before_delete_post', function ( $post_id ) {
+	$key = get_post_meta( $post_id, '_mkn_seed_key', true );
+	if ( $key ) {
+		$gone         = (array) get_option( 'mkn_seed_deleted', array() );
+		$gone[ $key ] = 1;
+		update_option( 'mkn_seed_deleted', $gone, false );
+	}
+} );
+
+/* Designed pages are found by their address, so their slug stays fixed. */
+add_filter( 'wp_insert_post_data', function ( $data, $postarr ) {
+	if ( ! empty( $postarr['ID'] ) && 'page' === $data['post_type'] ) {
+		$key = get_post_meta( (int) $postarr['ID'], '_mkn_seed_key', true );
+		if ( is_string( $key ) && 0 === strpos( $key, 'page:' ) ) {
+			$data['post_name'] = substr( $key, 5 );
+		}
+	}
+	return $data;
+}, 10, 2 );
 
 /** Page slug => title for the designed pages. */
 function mkn_seed_pages() {
@@ -34,23 +52,29 @@ function mkn_seed_pages() {
 	);
 }
 
-/** Find an item created by a previous import. */
+/** Find an item created by a previous import (also in the trash). */
 function mkn_seeded( $seed_key, $type ) {
 	$q = get_posts( array(
 		'post_type'        => $type,
-		'post_status'      => 'any',
+		'post_status'      => array( 'any', 'trash' ),
 		'posts_per_page'   => 1,
 		'fields'           => 'ids',
-		'meta_key'         => '_mkn_seed_key', // phpcs:ignore WordPress.DB.SlowDBQuery -- one-time import
+		'meta_key'         => '_mkn_seed_key', // phpcs:ignore WordPress.DB.SlowDBQuery -- import only
 		'meta_value'       => $seed_key,       // phpcs:ignore WordPress.DB.SlowDBQuery
 		'suppress_filters' => true,
 	) );
 	return $q ? (int) $q[0] : 0;
 }
 
-/** Copy an image shipped with the theme into the media library (once). */
-function mkn_import_image( $rel, $alt, $parent = 0 ) {
-	$key  = 'img:' . $rel;
+/** Was this seed item imported before (it exists, is in the trash, or was deleted on purpose)? */
+function mkn_seed_skip( $seed_key, $type ) {
+	$gone = (array) get_option( 'mkn_seed_deleted', array() );
+	return isset( $gone[ $seed_key ] ) || mkn_seeded( $seed_key, $type );
+}
+
+/** Copy an image shipped with the theme into the media library (once per seed key). */
+function mkn_import_image( $rel, $alt, $parent = 0, $key = '' ) {
+	$key  = $key ? $key : 'img:' . $rel;
 	$have = mkn_seeded( $key, 'attachment' );
 	if ( $have ) {
 		return $have;
@@ -75,6 +99,24 @@ function mkn_import_image( $rel, $alt, $parent = 0 ) {
 	update_post_meta( $id, '_wp_attachment_image_alt', $alt );
 	update_post_meta( $id, '_mkn_seed_key', $key );
 	return (int) $id;
+}
+
+/**
+ * Give an imported item its image. The pending marker is set when the item is created and removed
+ * once the image is in place, so an image that failed (or an interrupted run) is retried later,
+ * while an image the owner removed on purpose is not added back.
+ */
+function mkn_import_item_image( $id, $rel, $alt, $key = '' ) {
+	if ( ! get_post_meta( $id, '_mkn_seed_image', true ) ) {
+		return;
+	}
+	if ( ! has_post_thumbnail( $id ) ) {
+		$img = mkn_import_image( $rel, $alt, $id, $key );
+		if ( ! $img || ! set_post_thumbnail( $id, $img ) ) {
+			return;
+		}
+	}
+	delete_post_meta( $id, '_mkn_seed_image' );
 }
 
 function mkn_import_log( $msg ) {
@@ -111,37 +153,70 @@ function mkn_seed_link( $href ) {
 	return $href;
 }
 
+/** Remove the sample post, sample page and draft privacy page WordPress creates (any language), if untouched. */
+function mkn_remove_sample_content() {
+	$ids = array( 1, 2 );
+	$pp  = (int) get_option( 'wp_page_for_privacy_policy' );
+	if ( $pp ) {
+		$ids[] = $pp;
+	}
+	foreach ( $ids as $id ) {
+		$p = get_post( $id );
+		if ( ! $p || get_post_meta( $id, '_mkn_seed_key', true ) || $p->post_modified_gmt !== $p->post_date_gmt ) {
+			continue;
+		}
+		$sample = ( 1 === $id && 'post' === $p->post_type ) || ( 2 === $id && 'page' === $p->post_type && 'publish' === $p->post_status ) || ( $pp === $id && 'page' === $p->post_type && 'draft' === $p->post_status );
+		if ( $sample ) {
+			wp_delete_post( $id, true );
+		}
+	}
+}
+
+/** Insert one seed item with its meta in a single call. */
+function mkn_seed_insert( $args, $key, $meta ) {
+	$meta['_mkn_seed_key'] = $key;
+	$id                    = wp_insert_post( $args + array( 'post_status' => 'publish', 'meta_input' => $meta ), true );
+	if ( is_wp_error( $id ) ) {
+		mkn_import_log( 'تعذر إنشاء ' . ( isset( $args['post_title'] ) ? $args['post_title'] : $key ) . ': ' . $id->get_error_message() );
+		return 0;
+	}
+	return (int) $id;
+}
+
 function mkn_import_run( $force = false ) {
-	if ( ! $force && get_transient( 'mkn_seed_lock' ) ) {
+	// One run at a time: add_option is atomic, a lock older than 10 minutes is stale.
+	$lock = (int) get_option( 'mkn_seed_lock' );
+	if ( $lock ) {
+		if ( time() - $lock < 10 * MINUTE_IN_SECONDS && ! $force ) {
+			return;
+		}
+		delete_option( 'mkn_seed_lock' );
+	}
+	if ( ! add_option( 'mkn_seed_lock', time(), '', 'no' ) && ! $force ) {
 		return;
 	}
-	set_transient( 'mkn_seed_lock', 1, 5 * MINUTE_IN_SECONDS );
 	if ( function_exists( 'set_time_limit' ) ) {
 		@set_time_limit( 300 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors -- not allowed on some hosts
 	}
+	$first = ! get_option( 'mkn_seed_done' );
 	delete_option( 'mkn_seed_log' );
 	$seed = mkn_seed();
 
-	/* Site identity and reading options. */
-	if ( 'Just another WordPress site' === get_option( 'blogdescription' ) || '' === get_option( 'blogdescription' ) ) {
-		update_option( 'blogdescription', 'سوّق بالعربي، سوّق صح' );
-	}
-	if ( in_array( get_option( 'blogname' ), array( '', 'My WordPress Website', 'My Blog', 'My WordPress Blog', 'WordPress' ), true ) ) {
-		update_option( 'blogname', 'MKN ARABIA' );
-	}
-	update_option( 'default_comment_status', 'closed' );
-	update_option( 'default_ping_status', 'closed' );
-	update_option( 'timezone_string', 'Asia/Amman' );
-	if ( (int) get_option( 'posts_per_page' ) < 12 ) {
-		update_option( 'posts_per_page', 12 );
-	}
-
-	/* Remove WordPress sample content (only if it was never edited). */
-	foreach ( array( array( 'hello-world', 'post' ), array( 'sample-page', 'page' ), array( 'privacy-policy', 'page' ) ) as $s ) {
-		$p = get_page_by_path( $s[0], OBJECT, $s[1] );
-		if ( $p && $p->post_modified_gmt === $p->post_date_gmt && ( 'privacy-policy' !== $s[0] || 'draft' === $p->post_status ) ) {
-			wp_delete_post( $p->ID, true );
+	/* Site identity and reading options: first run only, so later runs never undo the owner's choices. */
+	if ( $first ) {
+		if ( in_array( get_option( 'blogdescription' ), array( '', 'Just another WordPress site' ), true ) || false !== strpos( (string) get_option( 'blogdescription' ), 'WordPress' ) ) {
+			update_option( 'blogdescription', 'سوّق بالعربي، سوّق صح' );
 		}
+		if ( in_array( get_option( 'blogname' ), array( '', 'My WordPress Website', 'My Blog', 'My WordPress Blog', 'WordPress' ), true ) ) {
+			update_option( 'blogname', 'MKN ARABIA' );
+		}
+		update_option( 'default_comment_status', 'closed' );
+		update_option( 'default_ping_status', 'closed' );
+		update_option( 'timezone_string', 'Asia/Amman' );
+		if ( (int) get_option( 'posts_per_page' ) < 12 ) {
+			update_option( 'posts_per_page', 12 );
+		}
+		mkn_remove_sample_content();
 	}
 
 	/* Pages. */
@@ -150,145 +225,130 @@ function mkn_import_run( $force = false ) {
 		$p = get_page_by_path( $slug, OBJECT, 'page' );
 		if ( $p ) {
 			$ids[ $slug ] = $p->ID;
+			if ( ! get_post_meta( $p->ID, '_mkn_seed_key', true ) ) {
+				update_post_meta( $p->ID, '_mkn_seed_key', 'page:' . $slug );
+			}
 			continue;
 		}
-		$id = wp_insert_post( array(
-			'post_type'      => 'page',
-			'post_status'    => 'publish',
-			'post_title'     => $title,
-			'post_name'      => $slug,
-			'post_content'   => '',
-			'comment_status' => 'closed',
-			'ping_status'    => 'closed',
-			'menu_order'     => count( $ids ),
-		), true );
-		if ( is_wp_error( $id ) ) {
-			mkn_import_log( 'تعذر إنشاء صفحة ' . $title );
+		if ( mkn_seed_skip( 'page:' . $slug, 'page' ) ) {
 			continue;
 		}
-		update_post_meta( $id, '_mkn_seed_key', 'page:' . $slug );
-		$ids[ $slug ] = $id;
+		$id = mkn_seed_insert( array( 'post_type' => 'page', 'post_title' => $title, 'post_name' => $slug, 'post_content' => '', 'comment_status' => 'closed', 'ping_status' => 'closed', 'menu_order' => count( $ids ) ), 'page:' . $slug, array() );
+		if ( $id ) {
+			$ids[ $slug ] = $id;
+		}
 	}
-	if ( ! empty( $ids['home'] ) && ! empty( $ids['insights'] ) ) {
-		update_option( 'show_on_front', 'page' );
-		update_option( 'page_on_front', $ids['home'] );
-		update_option( 'page_for_posts', $ids['insights'] );
+	if ( $first ) {
+		if ( ! empty( $ids['home'] ) && ! empty( $ids['insights'] ) ) {
+			update_option( 'show_on_front', 'page' );
+			update_option( 'page_on_front', $ids['home'] );
+			update_option( 'page_for_posts', $ids['insights'] );
+		}
+		if ( ! empty( $ids['privacy'] ) ) {
+			update_option( 'wp_page_for_privacy_policy', $ids['privacy'] );
+		}
+		/* Articles live under /insights/. */
+		if ( '/insights/%postname%/' !== get_option( 'permalink_structure' ) ) {
+			global $wp_rewrite;
+			$wp_rewrite->set_permalink_structure( '/insights/%postname%/' );
+		}
+		mkn_rewrite_rules();
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		flush_rewrite_rules( true );
 	}
-	if ( ! empty( $ids['privacy'] ) ) {
-		update_option( 'wp_page_for_privacy_policy', $ids['privacy'] );
-	}
-
-	/* Articles live under /insights/. */
-	if ( '/insights/%postname%/' !== get_option( 'permalink_structure' ) ) {
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure( '/insights/%postname%/' );
-	}
-	mkn_rewrite_rules();
-	require_once ABSPATH . 'wp-admin/includes/misc.php';
-	require_once ABSPATH . 'wp-admin/includes/file.php';
-	flush_rewrite_rules( true );
 
 	/* Client logos. */
 	$client_ids = array();
 	foreach ( (array) $seed['clients'] as $i => $c ) {
 		$key = 'client:' . $c['key'];
 		$id  = mkn_seeded( $key, 'mkn_client' );
-		if ( ! $id ) {
-			$id = wp_insert_post( array( 'post_type' => 'mkn_client', 'post_status' => 'publish', 'post_title' => $c['label'], 'menu_order' => $i ), true );
-			if ( is_wp_error( $id ) ) {
-				continue;
-			}
-			update_post_meta( $id, '_mkn_seed_key', $key );
-			foreach ( array( 'tone', 'bg', 'fit', 'clip' ) as $f ) {
-				update_post_meta( $id, '_mkn_' . $f, (string) $c[ $f ] );
-			}
-			$img = mkn_import_image( 'clients/' . $c['file'], $c['label'], $id );
-			if ( $img ) {
-				set_post_thumbnail( $id, $img );
-			}
+		if ( ! $id && ! mkn_seed_skip( $key, 'mkn_client' ) ) {
+			$id = mkn_seed_insert( array( 'post_type' => 'mkn_client', 'post_title' => $c['label'], 'menu_order' => $i ), $key, array(
+				'_mkn_tone'       => (string) $c['tone'],
+				'_mkn_bg'         => (string) $c['bg'],
+				'_mkn_fit'        => (string) $c['fit'],
+				'_mkn_clip'       => (string) $c['clip'],
+				'_mkn_seed_image' => '1',
+			) );
 		}
-		$client_ids[ $c['key'] ] = $id;
+		if ( $id ) {
+			mkn_import_item_image( $id, 'clients/' . $c['file'], $c['label'] );
+			$client_ids[ $c['key'] ] = $id;
+		}
 	}
 
-	/* Case studies. */
+	/* Case studies (each with its own copy of its image, so removing a client logo never empties a case). */
 	foreach ( (array) $seed['cases'] as $i => $c ) {
 		$key = 'case:' . $c['slug'];
-		if ( mkn_seeded( $key, 'mkn_case' ) ) {
-			continue;
+		$id  = mkn_seeded( $key, 'mkn_case' );
+		if ( ! $id && ! mkn_seed_skip( $key, 'mkn_case' ) ) {
+			$meta = array(
+				'sub'        => $c['sub'],
+				'challenge'  => $c['challenge'],
+				'role'       => $c['role'],
+				'done'       => $c['done'],
+				'outputs'    => $c['outputs'],
+				'reading'    => $c['reading'],
+				'depts'      => implode( ',', (array) $c['depts'] ),
+				'bundle'     => $c['bundle'],
+				'index_name' => isset( $c['index_name'] ) && $c['index_name'] !== $c['name'] ? $c['index_name'] : '',
+				'index_sub'  => $c['index_sub'] !== $c['sub'] ? $c['index_sub'] : '',
+				'featured'   => $c['featured'] ? '1' : '',
+				'teaser'     => $c['teaser'],
+				'tile'       => $c['tile'],
+				'wide'       => $c['wide'] ? '1' : '',
+				'seed_image' => '1',
+			);
+			$in = array();
+			foreach ( $meta as $f => $v ) {
+				$in[ '_mkn_' . $f ] = (string) $v;
+			}
+			$id = mkn_seed_insert( array( 'post_type' => 'mkn_case', 'post_title' => $c['name'], 'post_name' => $c['slug'], 'menu_order' => $i ), $key, $in );
 		}
-		$id = wp_insert_post( array( 'post_type' => 'mkn_case', 'post_status' => 'publish', 'post_title' => $c['name'], 'post_name' => $c['slug'], 'menu_order' => $i ), true );
-		if ( is_wp_error( $id ) ) {
-			continue;
-		}
-		update_post_meta( $id, '_mkn_seed_key', $key );
-		$meta = array(
-			'sub'        => $c['sub'],
-			'challenge'  => $c['challenge'],
-			'role'       => $c['role'],
-			'done'       => $c['done'],
-			'outputs'    => $c['outputs'],
-			'reading'    => $c['reading'],
-			'depts'      => implode( ',', (array) $c['depts'] ),
-			'bundle'     => $c['bundle'],
-			'index_name' => isset( $c['index_name'] ) && $c['index_name'] !== $c['name'] ? $c['index_name'] : '',
-			'index_sub'  => $c['index_sub'] !== $c['sub'] ? $c['index_sub'] : '',
-			'featured'   => $c['featured'] ? '1' : '',
-			'teaser'     => $c['teaser'],
-			'tile'       => $c['tile'],
-			'wide'       => $c['wide'] ? '1' : '',
-		);
-		foreach ( $meta as $f => $v ) {
-			update_post_meta( $id, '_mkn_' . $f, (string) $v );
-		}
-		$img = mkn_import_image( $c['image'], ! empty( $c['image_alt'] ) ? $c['image_alt'] : $c['name'], $id );
-		if ( $img ) {
-			set_post_thumbnail( $id, $img );
+		if ( $id ) {
+			mkn_import_item_image( $id, $c['image'], ! empty( $c['image_alt'] ) ? $c['image_alt'] : $c['name'], 'img:case:' . $c['image'] );
 		}
 	}
 
 	/* Testimonials. */
 	foreach ( (array) $seed['testimonials'] as $i => $t ) {
 		$key = 'testimonial:' . md5( $t['brand'] . '|' . $t['country'] );
-		if ( mkn_seeded( $key, 'mkn_testimonial' ) ) {
+		if ( mkn_seed_skip( $key, 'mkn_testimonial' ) ) {
 			continue;
 		}
-		$id = wp_insert_post( array( 'post_type' => 'mkn_testimonial', 'post_status' => 'publish', 'post_title' => $t['brand'], 'menu_order' => $i ), true );
-		if ( is_wp_error( $id ) ) {
-			continue;
-		}
-		update_post_meta( $id, '_mkn_seed_key', $key );
-		update_post_meta( $id, '_mkn_text', $t['text'] );
-		update_post_meta( $id, '_mkn_place', $t['place'] );
-		update_post_meta( $id, '_mkn_country', $t['country'] );
-		update_post_meta( $id, '_mkn_case', $t['case'] );
-		update_post_meta( $id, '_mkn_featured', $t['featured'] ? '1' : '' );
-		update_post_meta( $id, '_mkn_logo', $t['logo'] && isset( $client_ids[ $t['logo'] ] ) ? (string) $client_ids[ $t['logo'] ] : '' );
+		mkn_seed_insert( array( 'post_type' => 'mkn_testimonial', 'post_title' => $t['brand'], 'menu_order' => $i ), $key, array(
+			'_mkn_text'       => $t['text'],
+			'_mkn_place'      => $t['place'],
+			'_mkn_country'    => $t['country'],
+			'_mkn_case'       => $t['case'],
+			'_mkn_featured'   => $t['featured'] ? '1' : '',
+			'_mkn_logo'       => $t['logo'] && isset( $client_ids[ $t['logo'] ] ) ? (string) $client_ids[ $t['logo'] ] : '',
+			'_mkn_seed_brand' => $t['brand'],
+		) );
 	}
 
 	/* FAQ. */
 	foreach ( (array) $seed['faq'] as $i => $f ) {
 		$key = 'faq:' . md5( $f['q'] );
-		if ( mkn_seeded( $key, 'mkn_faq' ) ) {
-			continue;
-		}
-		$id = wp_insert_post( array( 'post_type' => 'mkn_faq', 'post_status' => 'publish', 'post_title' => $f['q'], 'menu_order' => $i ), true );
-		if ( ! is_wp_error( $id ) ) {
-			update_post_meta( $id, '_mkn_seed_key', $key );
-			update_post_meta( $id, '_mkn_answer', $f['a'] );
+		if ( ! mkn_seed_skip( $key, 'mkn_faq' ) ) {
+			mkn_seed_insert( array( 'post_type' => 'mkn_faq', 'post_title' => $f['q'], 'menu_order' => $i ), $key, array( '_mkn_answer' => $f['a'] ) );
 		}
 	}
 
 	/* Articles: newest first, in the same order as the static site. */
-	$n = count( (array) $seed['articles'] );
 	foreach ( (array) $seed['articles'] as $i => $a ) {
 		$key = 'article:' . $a['slug'];
-		if ( mkn_seeded( $key, 'post' ) || get_page_by_path( $a['slug'], OBJECT, 'post' ) ) {
+		if ( mkn_seed_skip( $key, 'post' ) || get_page_by_path( $a['slug'], OBJECT, 'post' ) ) {
 			continue;
 		}
+		$related = array();
+		foreach ( (array) $a['related'] as $r ) {
+			$related[] = $r[1] . ' | ' . mkn_seed_link( $r[0] );
+		}
 		$date = gmdate( 'Y-m-d H:i:s', strtotime( '2026-10-11 09:00:00' ) - ( $i * DAY_IN_SECONDS ) );
-		$id   = wp_insert_post( array(
+		mkn_seed_insert( array(
 			'post_type'      => 'post',
-			'post_status'    => 'publish',
 			'post_title'     => $a['title'],
 			'post_name'      => $a['slug'],
 			'post_excerpt'   => $a['desc'],
@@ -297,29 +357,22 @@ function mkn_import_run( $force = false ) {
 			'post_date'      => get_date_from_gmt( $date ),
 			'comment_status' => 'closed',
 			'ping_status'    => 'closed',
-		), true );
-		if ( is_wp_error( $id ) ) {
-			mkn_import_log( 'تعذر إنشاء المقال ' . $a['title'] );
-			continue;
-		}
-		$related = array();
-		foreach ( (array) $a['related'] as $r ) {
-			$related[] = $r[1] . ' | ' . mkn_seed_link( $r[0] );
-		}
-		update_post_meta( $id, '_mkn_seed_key', $key );
-		update_post_meta( $id, '_mkn_topic', $a['topic'] );
-		update_post_meta( $id, '_mkn_cta', $a['cta'] );
-		update_post_meta( $id, '_mkn_seo_title', $a['seo'] );
-		update_post_meta( $id, '_mkn_related', implode( "\n", $related ) );
+		), $key, array(
+			'_mkn_topic'     => $a['topic'],
+			'_mkn_cta'       => $a['cta'],
+			'_mkn_seo_title' => $a['seo'],
+			'_mkn_related'   => implode( "\n", $related ),
+		) );
 	}
-	unset( $n );
 
-	mkn_write_htaccess();
+	if ( $first ) {
+		mkn_write_htaccess();
+	}
 
 	update_option( 'mkn_seed_version', MKN_VERSION, false );
 	update_option( 'mkn_seed_done', time(), false );
 	update_option( 'mkn_seed_state', 'done', true );
-	delete_transient( 'mkn_seed_lock' );
+	delete_option( 'mkn_seed_lock' );
 	mkn_flush_page_cache();
 }
 
@@ -330,8 +383,8 @@ function mkn_rewrite_rules() {
 add_action( 'init', 'mkn_rewrite_rules' );
 
 /*
- * Server rules that WordPress itself does not add: HTTPS and the non-www domain, browser caching for
- * the theme files, security headers. Written once, before the WordPress block, between markers.
+ * Server rules that WordPress itself does not add (data/htaccess.txt): old static addresses, browser
+ * caching for the theme files and security headers. Written once, before the WordPress block.
  */
 function mkn_write_htaccess() {
 	require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -340,44 +393,20 @@ function mkn_write_htaccess() {
 		mkn_import_log( 'لم يُعدَّل ملف ‎.htaccess (غير موجود أو غير قابل للكتابة).' );
 		return;
 	}
-	$host  = (string) wp_parse_url( home_url(), PHP_URL_HOST );
-	$https = 0 === strpos( home_url(), 'https://' );
-	$bare  = preg_replace( '/^www\./', '', $host );
-	$rules = array( '# BEGIN MKN ARABIA' );
-	if ( $https && $host === $bare && false === strpos( $host, 'localhost' ) ) {
-		$rules = array_merge( $rules, array(
-			'<IfModule mod_rewrite.c>',
-			'RewriteEngine On',
-			'RewriteCond %{HTTPS} !=on',
-			'RewriteRule ^ https://' . $host . '%{REQUEST_URI} [L,R=301]',
-			'RewriteCond %{HTTP_HOST} ^www\.' . preg_quote( $host, '' ) . '$ [NC]',
-			'RewriteRule ^ https://' . $host . '%{REQUEST_URI} [L,R=301]',
-			'</IfModule>',
-		) );
+	// HTTPS is forced by Hostinger itself (hPanel ← SSL, switched on by the deploy script). The block is
+	// shared with tools/deploy/hostinger_deploy.py, which writes the same lines.
+	$rules = file_get_contents( MKN_DIR . '/data/htaccess.txt' );
+	if ( ! $rules || false === strpos( $rules, '# END MKN ARABIA' ) ) {
+		return;
 	}
-	$rules = array_merge( $rules, array(
-		'<IfModule mod_expires.c>',
-		'  ExpiresActive On',
-		'  ExpiresByType text/css "access plus 1 year"',
-		'  ExpiresByType application/javascript "access plus 1 year"',
-		'  ExpiresByType font/woff2 "access plus 1 year"',
-		'  ExpiresByType image/webp "access plus 6 months"',
-		'  ExpiresByType image/png "access plus 6 months"',
-		'  ExpiresByType image/jpeg "access plus 6 months"',
-		'</IfModule>',
-		'AddType font/woff2 .woff2',
-		'<IfModule mod_headers.c>',
-		'  Header always set X-Content-Type-Options "nosniff"',
-		'  Header always set Referrer-Policy "strict-origin-when-cross-origin"',
-		'  Header always set X-Frame-Options "SAMEORIGIN"',
-		'  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"',
-		'</IfModule>',
-		'# END MKN ARABIA',
-	) );
-	$current = (string) file_get_contents( $file );
-	$current = preg_replace( '/# BEGIN MKN ARABIA.*?# END MKN ARABIA\R*/su', '', $current );
+	$current = file_get_contents( $file );
+	$current = false === $current ? null : preg_replace( '/# BEGIN MKN ARABIA.*?# END MKN ARABIA\R*/s', '', $current );
+	if ( null === $current ) {
+		mkn_import_log( 'لم يُعدَّل ملف ‎.htaccess (تعذرت قراءته).' );
+		return;
+	}
 	if ( ! file_exists( $file . '.mkn-backup' ) ) {
 		@copy( $file, $file . '.mkn-backup' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 	}
-	file_put_contents( $file, implode( "\n", $rules ) . "\n\n" . ltrim( $current ), LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	file_put_contents( $file, trim( $rules ) . "\n\n" . ltrim( $current ), LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 }

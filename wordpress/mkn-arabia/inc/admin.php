@@ -68,7 +68,7 @@ function mkn_dashboard_widget() {
 	};
 	$new   = mkn_new_leads();
 	$rows  = array(
-		array( 'طلبات التواصل', admin_url( 'edit.php?post_type=mkn_lead' ), $count( 'mkn_lead', 'private' ) . ( $new ? ' · ' . $new . ' جديد' : '' ), '' ),
+		mkn_can_see_leads() ? array( 'طلبات التواصل', admin_url( 'edit.php?post_type=mkn_lead' ), $count( 'mkn_lead', 'private' ) . ( $new ? ' · ' . $new . ' جديد' : '' ), '' ) : null,
 		array( 'المقالات', admin_url( 'edit.php' ), $count( 'post' ), admin_url( 'post-new.php' ) ),
 		array( 'دراسات الحالة', admin_url( 'edit.php?post_type=mkn_case' ), $count( 'mkn_case' ), admin_url( 'post-new.php?post_type=mkn_case' ) ),
 		array( 'آراء العملاء', admin_url( 'edit.php?post_type=mkn_testimonial' ), $count( 'mkn_testimonial' ), admin_url( 'post-new.php?post_type=mkn_testimonial' ) ),
@@ -76,7 +76,7 @@ function mkn_dashboard_widget() {
 		array( 'الأسئلة الشائعة', admin_url( 'edit.php?post_type=mkn_faq' ), $count( 'mkn_faq' ), admin_url( 'post-new.php?post_type=mkn_faq' ) ),
 	);
 	echo '<table class="widefat striped"><tbody>';
-	foreach ( $rows as $r ) {
+	foreach ( array_filter( $rows ) as $r ) {
 		echo '<tr><td><a href="' . esc_url( $r[1] ) . '"><b>' . esc_html( $r[0] ) . '</b></a></td><td>' . esc_html( (string) $r[2] ) . '</td><td style="text-align:left">' . ( $r[3] ? '<a class="button button-small" href="' . esc_url( $r[3] ) . '">إضافة</a>' : '' ) . '</td></tr>';
 	}
 	echo '</tbody></table>';

@@ -8,10 +8,6 @@ $mkn_depts = '';
 foreach ( (array) mkn_site( 'depts' ) as $mkn_d ) {
 	$mkn_depts .= '<li><a href="' . esc_url( mkn_url( 'services' ) . '#' . $mkn_d['key'] ) . '"><span class="ltr">' . esc_html( $mkn_d['code'] ) . '</span> · ' . esc_html( $mkn_d['short'] ) . '</a></li>';
 }
-$mkn_handle = function ( $url ) {
-	$path = trim( (string) wp_parse_url( $url, PHP_URL_PATH ), '/' );
-	return $path ? '@' . basename( $path ) : '';
-};
 ?>
 </main>
 <footer class="footer">
@@ -48,10 +44,10 @@ $mkn_handle = function ( $url ) {
         <h2 class="fh">تواصل</h2>
         <ul>
           <li><a <?php echo mkn_book_attrs(); // phpcs:ignore WordPress.Security.EscapeOutput ?>>احجز استشارة مجانية</a></li>
-          <li><a href="#" data-wa>واتساب · <span class="ltr"><?php echo esc_html( mkn_opt( 'wa_display' ) ); ?></span></a></li>
+          <li><a href="#" data-wa>واتساب · <span class="ltr"><?php echo esc_html( mkn_wa_display() ); ?></span></a></li>
           <li><a data-email href="<?php echo esc_url( 'mailto:' . mkn_opt( 'email' ) ); ?>"><?php echo esc_html( mkn_opt( 'email' ) ); ?></a></li>
-          <?php if ( mkn_opt( 'instagram' ) ) : ?><li><a href="<?php echo esc_url( mkn_opt( 'instagram' ) ); ?>" target="_blank" rel="noopener">Instagram · <span class="ltr"><?php echo esc_html( $mkn_handle( mkn_opt( 'instagram' ) ) ); ?></span></a></li><?php endif; ?>
-          <?php if ( mkn_opt( 'facebook' ) ) : ?><li><a href="<?php echo esc_url( mkn_opt( 'facebook' ) ); ?>" target="_blank" rel="noopener">Facebook · <span class="ltr"><?php echo esc_html( $mkn_handle( mkn_opt( 'facebook' ) ) ); ?></span></a></li><?php endif; ?>
+          <?php if ( mkn_opt( 'instagram' ) ) : ?><li><a href="<?php echo esc_url( mkn_opt( 'instagram' ) ); ?>" target="_blank" rel="noopener">Instagram<?php if ( mkn_social_handle( mkn_opt( 'instagram' ) ) ) : ?> · <span class="ltr"><?php echo esc_html( mkn_social_handle( mkn_opt( 'instagram' ) ) ); ?></span><?php endif; ?></a></li><?php endif; ?>
+          <?php if ( mkn_opt( 'facebook' ) ) : ?><li><a href="<?php echo esc_url( mkn_opt( 'facebook' ) ); ?>" target="_blank" rel="noopener">Facebook<?php if ( mkn_social_handle( mkn_opt( 'facebook' ) ) ) : ?> · <span class="ltr"><?php echo esc_html( mkn_social_handle( mkn_opt( 'facebook' ) ) ); ?></span><?php endif; ?></a></li><?php endif; ?>
           <?php if ( mkn_opt( 'linkedin' ) ) : ?><li><a href="<?php echo esc_url( mkn_opt( 'linkedin' ) ); ?>" target="_blank" rel="noopener">LinkedIn · MKN ARABIA</a></li><?php endif; ?>
         </ul>
       </div>

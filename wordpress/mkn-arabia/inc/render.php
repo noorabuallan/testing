@@ -43,14 +43,43 @@ function mkn_book_attrs() {
 	return 'href="' . esc_url( mkn_opt( 'book' ) ) . '" target="_blank" rel="noopener" data-book';
 }
 
-/** Replace {{…}} placeholders in generated markup. */
+/** «@name» shown next to a social link, or '' when the address has no simple handle (profile.php?id=…). */
+function mkn_social_handle( $url ) {
+	$path = trim( (string) wp_parse_url( $url, PHP_URL_PATH ), '/' );
+	return ( '' !== $path && false === strpos( $path, '/' ) && false === strpos( $path, '.' ) ) ? '@' . $path : '';
+}
+
+/** WhatsApp number as shown to visitors (falls back to the dialling number). */
+function mkn_wa_display() {
+	return '' !== mkn_opt( 'wa_display' ) ? mkn_opt( 'wa_display' ) : '+' . mkn_opt( 'whatsapp' );
+}
+
+/** Replace {{…}} placeholders in generated markup. Links whose setting was emptied are left out. */
 function mkn_fill_placeholders( $html ) {
+	foreach ( array( 'instagram', 'facebook', 'linkedin' ) as $k ) {
+		$pattern = '/<a href="\{\{' . $k . '\}\}"[^>]*>.*?<\/a>/su';
+		if ( '' === mkn_opt( $k ) ) {
+			$html = preg_replace( $pattern, '', $html );
+		} elseif ( 'linkedin' !== $k ) {
+			$handle = mkn_social_handle( mkn_opt( $k ) );
+			$handle = $handle ? $handle : ucfirst( $k );
+			$html   = preg_replace_callback( $pattern, function ( $m ) use ( $handle ) {
+				return preg_replace( '/<b>@[^<]*<\/b>/u', '<b>' . esc_html( $handle ) . '</b>', $m[0] );
+			}, $html );
+		}
+	}
+	if ( '' === mkn_opt( 'linkedin_founder' ) ) {
+		$html = preg_replace( '/ · <a href="\{\{linkedin_founder\}\}"[^>]*>.*?<\/a>/su', '', $html );
+	}
+	if ( '' === mkn_opt( 'book_embed' ) ) {
+		$html = preg_replace( '/<iframe src="\{\{book_embed\}\}"[^>]*><\/iframe>\s*(<div class="booking__alt">)<p class="form-note">[^<]*<\/p>/su', '$1', $html );
+	}
 	$map = array(
 		'{{a}}'                => esc_url( MKN_URI . '/assets' ),
 		'{{book}}'             => esc_url( mkn_opt( 'book' ) ),
 		'{{book_embed}}'       => esc_url( mkn_opt( 'book_embed' ) ),
 		'{{email}}'            => esc_html( mkn_opt( 'email' ) ),
-		'{{wa_display}}'       => esc_html( mkn_opt( 'wa_display' ) ),
+		'{{wa_display}}'       => esc_html( mkn_wa_display() ),
 		'{{instagram}}'        => esc_url( mkn_opt( 'instagram' ) ),
 		'{{facebook}}'         => esc_url( mkn_opt( 'facebook' ) ),
 		'{{linkedin}}'         => esc_url( mkn_opt( 'linkedin' ) ),
@@ -86,14 +115,21 @@ function mkn_slot( $name, $arg ) {
 		case 'logo_wall':
 			return '<div class="logo-wall">' . implode( '', array_map( 'mkn_logo_tile', mkn_items( 'mkn_client' ) ) ) . '</div>';
 		case 'proof_quotes':
-			$out = '';
-			foreach ( explode( ',', $arg ) as $brand ) {
-				$t = mkn_testimonial_by_brand( trim( $brand ) );
+			$want = array_filter( array_map( 'trim', explode( ',', $arg ) ) );
+			$used = array();
+			foreach ( $want as $brand ) {
+				$t = mkn_testimonial_by_brand( $brand );
 				if ( $t ) {
-					$out .= mkn_tcard( $t );
+					$used[ $t->ID ] = $t;
 				}
 			}
-			return $out;
+			foreach ( mkn_featured( 'mkn_testimonial' ) as $t ) { // keep the strip full if a quote was removed
+				if ( count( $used ) >= count( $want ) ) {
+					break;
+				}
+				$used[ $t->ID ] = $t;
+			}
+			return implode( '', array_map( 'mkn_tcard', array_values( $used ) ) );
 		case 'brands_count':
 			$brands = array();
 			foreach ( mkn_items( 'mkn_testimonial' ) as $t ) {
@@ -106,6 +142,10 @@ function mkn_slot( $name, $arg ) {
 			return (string) count( mkn_items( 'mkn_testimonial' ) );
 		case 'testimonial_groups':
 			return mkn_testimonial_groups();
+		case 'testimonial_jump':
+			return mkn_testimonial_jump();
+		case 'countries_phrase':
+			return mkn_countries_phrase( count( mkn_testimonial_countries() ) );
 		case 'feature_cases':
 			return mkn_feature_cases();
 		case 'case_index':
@@ -134,14 +174,27 @@ function mkn_featured( $type ) {
 
 /* ---------- client logos ---------- */
 
-/** [url, width, height] of an item's image. */
+/**
+ * [url, width, height, attachment id] of an item's image. Full size is used so approved logo files are
+ * shown exactly as supplied; only an oversized upload (wider than 1200px) is swapped for its large copy.
+ */
 function mkn_image( $post_id ) {
 	$id = get_post_thumbnail_id( $post_id );
 	if ( ! $id ) {
 		return null;
 	}
 	$src = wp_get_attachment_image_src( $id, 'full' );
+	if ( $src && (int) $src[1] > 1200 ) {
+		$large = wp_get_attachment_image_src( $id, 'large' );
+		$src   = $large ? $large : $src;
+	}
 	return $src ? array( $src[0], (int) $src[1], (int) $src[2], $id ) : null;
+}
+
+/** srcset/sizes attributes for a photo, when WordPress has smaller copies of it. */
+function mkn_srcset( $attachment_id, $sizes ) {
+	$set = wp_get_attachment_image_srcset( $attachment_id, 'full' );
+	return $set ? ' srcset="' . esc_attr( $set ) . '" sizes="' . esc_attr( $sizes ) . '"' : '';
 }
 
 function mkn_logo_tile( $client, $eager = false ) {
@@ -194,11 +247,51 @@ function mkn_logos_rail( $sub ) {
 function mkn_testimonial_by_brand( $brand ) {
 	$brand = html_entity_decode( $brand, ENT_QUOTES, 'UTF-8' );
 	foreach ( mkn_items( 'mkn_testimonial' ) as $t ) {
-		if ( html_entity_decode( $t->post_title, ENT_QUOTES, 'UTF-8' ) === $brand ) {
+		if ( html_entity_decode( $t->post_title, ENT_QUOTES, 'UTF-8' ) === $brand || mkn_meta( $t->ID, 'seed_brand' ) === $brand ) {
 			return $t;
 		}
 	}
 	return null;
+}
+
+/** Country codes (in display order) that have at least one published testimonial. */
+function mkn_testimonial_countries() {
+	$have = array();
+	foreach ( mkn_items( 'mkn_testimonial' ) as $t ) {
+		$have[ mkn_meta( $t->ID, 'country' ) ] = 1;
+	}
+	$out = array();
+	foreach ( (array) mkn_site( 'countries' ) as $c ) {
+		if ( isset( $have[ $c[0] ] ) ) {
+			$out[] = $c;
+		}
+	}
+	return $out;
+}
+
+/** «ست دول», «دولتين» … for the testimonials intro. */
+function mkn_countries_phrase( $n ) {
+	$words = array( 1 => 'دولة واحدة', 2 => 'دولتين', 3 => 'ثلاث دول', 4 => 'أربع دول', 5 => 'خمس دول', 6 => 'ست دول', 7 => 'سبع دول', 8 => 'ثماني دول', 9 => 'تسع دول', 10 => 'عشر دول' );
+	return isset( $words[ $n ] ) ? $words[ $n ] : $n . ' دولة';
+}
+
+/** Country jump links on the testimonials page (only countries that have testimonials). */
+function mkn_testimonial_jump() {
+	$out = '';
+	foreach ( mkn_testimonial_countries() as $c ) {
+		$out .= '<a href="#' . esc_attr( $c[0] ) . '"><span class="label">' . esc_html( $c[2] ) . '</span>' . esc_html( $c[1] ) . '</a>';
+	}
+	return $out;
+}
+
+/** Owner-entered multi-line text: allowed inline tags, line breaks kept. */
+function mkn_text( $v ) {
+	return nl2br( wp_kses( $v, mkn_inline_kses() ), false );
+}
+
+/** Slugs of published case studies. */
+function mkn_case_slugs() {
+	return array_flip( wp_list_pluck( mkn_items( 'mkn_case' ), 'post_name' ) );
 }
 
 function mkn_is_english( $text ) {
@@ -232,9 +325,10 @@ function mkn_tcard( $t, $extra = '' ) {
 	$place = mkn_meta( $t->ID, 'place' );
 	$place = '' !== $place ? $place : mkn_country_name( mkn_meta( $t->ID, 'country' ) );
 	$case  = mkn_meta( $t->ID, 'case' );
+	$case  = isset( mkn_case_slugs()[ $case ] ) ? $case : '';
 	$link  = $case ? '<a href="' . esc_url( mkn_url( 'work' ) . '#' . $case ) . '" class="tlink">دراسة الحالة</a>' : '';
 	$tag   = $en ? '<span class="tlang">بالإنجليزية</span>' : '';
-	return '<figure class="cell tcard reveal' . esc_attr( $extra ) . '"><span class="tmark" aria-hidden="true">”</span><blockquote' . $ltr . '>' . wp_kses( $text, mkn_inline_kses() ) . '</blockquote><figcaption>' . mkn_tavatar( $t ) . '<span class="tby"><b>' . esc_html( $t->post_title ) . '</b><span>' . esc_html( $place ) . '</span></span>' . $tag . $link . '</figcaption></figure>';
+	return '<figure class="cell tcard reveal' . esc_attr( $extra ) . '"><span class="tmark" aria-hidden="true">”</span><blockquote' . $ltr . '>' . mkn_text( $text ) . '</blockquote><figcaption>' . mkn_tavatar( $t ) . '<span class="tby"><b>' . esc_html( $t->post_title ) . '</b><span>' . esc_html( $place ) . '</span></span>' . $tag . $link . '</figcaption></figure>';
 }
 
 function mkn_testimonial_groups() {
@@ -275,7 +369,7 @@ function mkn_feature_cases() {
 		$img = mkn_image( $c->ID );
 		$alt = $img ? get_post_meta( $img[3], '_wp_attachment_image_alt', true ) : '';
 		$out .= '<a href="' . esc_url( mkn_url( 'work' ) . '#' . $c->post_name ) . '" class="fcase reveal">'
-			. ( $img ? '<img src="' . esc_url( $img[0] ) . '" alt="' . esc_attr( $alt ? $alt : $c->post_title ) . '" loading="lazy" width="' . $img[1] . '" height="' . $img[2] . '">' : '' )
+			. ( $img ? '<img src="' . esc_url( $img[0] ) . '"' . mkn_srcset( $img[3], '(max-width: 640px) 80vw, 400px' ) . ' alt="' . esc_attr( $alt ? $alt : $c->post_title ) . '" loading="lazy" width="' . $img[1] . '" height="' . $img[2] . '">' : '' )
 			. '<div class="glass"><span class="label">CASE ' . sprintf( '%02d', $i + 1 ) . '</span><h3>' . esc_html( $c->post_title ) . '</h3><p>' . esc_html( mkn_meta( $c->ID, 'teaser' ) ) . '</p></div></a>' . "\n";
 	}
 	return $out;
@@ -297,7 +391,7 @@ function mkn_case_quote( $slug ) {
 			$text  = mkn_meta( $t->ID, 'text' );
 			$ltr   = mkn_is_english( $text ) ? ' dir="ltr"' : '';
 			$place = mkn_meta( $t->ID, 'place' );
-			return '<figure class="tquote"><blockquote' . $ltr . '>' . wp_kses( $text, mkn_inline_kses() ) . '</blockquote><figcaption><b>' . esc_html( $t->post_title ) . '</b>' . ( '' !== $place ? '<span>' . esc_html( $place ) . '</span>' : '' ) . '</figcaption></figure>';
+			return '<figure class="tquote"><blockquote' . $ltr . '>' . mkn_text( $text ) . '</blockquote><figcaption><b>' . esc_html( $t->post_title ) . '</b>' . ( '' !== $place ? '<span>' . esc_html( $place ) . '</span>' : '' ) . '</figcaption></figure>';
 		}
 	}
 	return '';
@@ -313,7 +407,7 @@ function mkn_full_case( $c, $idx ) {
 	if ( $img && $tile ) { // logo shown on its brand colour until a real application image exists
 		$media = '<div class="case__img case__img--tile" style="background:' . esc_attr( $tile ) . '"><img src="' . esc_url( $img[0] ) . '" alt="' . esc_attr( $c->post_title ) . '" loading="lazy"></div>';
 	} elseif ( $img ) {
-		$media = '<div class="case__img' . ( $wide ? ' case__img--wide' : '' ) . '"><img src="' . esc_url( $img[0] ) . '" alt="' . esc_attr( $c->post_title ) . '" loading="lazy"></div>';
+		$media = '<div class="case__img' . ( $wide ? ' case__img--wide' : '' ) . '"><img src="' . esc_url( $img[0] ) . '"' . mkn_srcset( $img[3], $wide ? '(max-width: 640px) 92vw, 480px' : '(max-width: 640px) 92vw, 360px' ) . ' alt="' . esc_attr( $c->post_title ) . '" loading="lazy"></div>';
 	}
 	$depts = array();
 	foreach ( (array) mkn_site( 'depts' ) as $d ) {
@@ -341,10 +435,10 @@ function mkn_full_case( $c, $idx ) {
 		$v = mkn_meta( $c->ID, $key );
 		if ( '' !== $v ) {
 			$rows .= '
-      <div><dt>' . $label . '</dt><dd>' . wp_kses( $v, $k ) . '</dd></div>';
+      <div><dt>' . $label . '</dt><dd>' . mkn_text( $v ) . '</dd></div>';
 		}
 	}
-	return '<article class="case glass glass--light reveal' . ( $wide ? ' case--wide' : '' ) . '" id="' . esc_attr( $c->post_name ) . '">
+	return '<article class="case glass glass--light reveal' . ( $wide ? ' case--wide' : '' ) . '" id="' . esc_attr( $c->post_name ) . '"' . ( '' === $media ? ' style="grid-template-columns:1fr"' : '' ) . '>
   ' . $media . '
   <div>
     <span class="label">SELECTED WORK · CASE ' . sprintf( '%02d', $idx ) . '</span>
@@ -352,7 +446,7 @@ function mkn_full_case( $c, $idx ) {
     <p class="sub">' . esc_html( mkn_meta( $c->ID, 'sub' ) ) . '</p>
     <dl>' . $rows . '
     </dl>
-    ' . ( '' !== $reading ? '<p class="reading">' . wp_kses( $reading, $k ) . '</p>' : '' ) . '
+    ' . ( '' !== $reading ? '<p class="reading">' . mkn_text( $reading ) . '</p>' : '' ) . '
     ' . mkn_case_quote( $c->post_name ) . '
     ' . $nxt . '
   </div>
@@ -386,14 +480,17 @@ function mkn_read_minutes( $post ) {
 }
 
 function mkn_post_desc( $post ) {
-	return has_excerpt( $post ) ? $post->post_excerpt : wp_trim_words( wp_strip_all_tags( $post->post_content ), 30, '…' );
+	if ( '' !== $post->post_password ) {
+		return '';
+	}
+	return has_excerpt( $post ) ? $post->post_excerpt : wp_trim_words( wp_strip_all_tags( strip_shortcodes( $post->post_content ) ), 30, '…' );
 }
 
 function mkn_post_topic( $post ) {
 	$t = mkn_meta( $post->ID, 'topic' );
 	if ( '' === $t ) {
 		$cats = get_the_category( $post->ID );
-		$t    = $cats ? $cats[0]->name : 'INSIGHTS';
+		$t    = ( $cats && (int) $cats[0]->term_id !== (int) get_option( 'default_category' ) ) ? $cats[0]->name : 'INSIGHTS';
 	}
 	return $t;
 }
@@ -423,7 +520,7 @@ function mkn_insights_all() {
 function mkn_faq() {
 	$out = '';
 	foreach ( mkn_items( 'mkn_faq' ) as $i => $f ) {
-		$out .= '<details' . ( 0 === $i ? ' open' : '' ) . '><summary><span class="label">Q' . sprintf( '%02d', $i + 1 ) . '</span>' . esc_html( $f->post_title ) . '</summary><p>' . wp_kses( mkn_meta( $f->ID, 'answer' ), mkn_inline_kses() ) . '</p></details>';
+		$out .= '<details' . ( 0 === $i ? ' open' : '' ) . '><summary><span class="label">Q' . sprintf( '%02d', $i + 1 ) . '</span>' . esc_html( $f->post_title ) . '</summary><p>' . mkn_text( mkn_meta( $f->ID, 'answer' ) ) . '</p></details>';
 	}
 	return $out;
 }
