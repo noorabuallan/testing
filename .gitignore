@@ -1,1 +1,3 @@
 .hostinger/wp-admin.txt
+__pycache__/
+*.pyc
