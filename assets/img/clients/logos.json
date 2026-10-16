@@ -1,0 +1,139 @@
+{
+ "les-senes": {
+  "label": "Les Sènes Spa",
+  "tone": "light",
+  "size": [
+   191,
+   113
+  ]
+ },
+ "osus": {
+  "label": "OSUS Events",
+  "tone": "custom",
+  "bg": "#314b48",
+  "size": [
+   360,
+   157
+  ]
+ },
+ "kyan": {
+  "label": "Kyan Real Estate",
+  "tone": "light",
+  "size": [
+   207,
+   170
+  ]
+ },
+ "e-spa": {
+  "label": "E SPA Dubai",
+  "tone": "custom",
+  "bg": "#fff1eb",
+  "size": [
+   274,
+   240
+  ],
+  "fit": "fill",
+  "clip": "circle(64% at 52.56% 62.59%)",
+  "approved": "2026-10-11 · exact uploaded image (brand-sources/client-logos/approved/E_SPA_APPROVED_Original.png), colour-managed P3→sRGB downscale; dark screenshot corners hidden by a display-only CSS clip",
+  "src": "e-spa-v2.webp"
+ },
+ "mireva": {
+  "label": "Mireva Group",
+  "tone": "light",
+  "size": [
+   360,
+   86
+  ]
+ },
+ "imperio": {
+  "label": "IMPERIO Events",
+  "tone": "custom",
+  "bg": "#2a0403",
+  "size": [
+   360,
+   106
+  ],
+  "approved": "2026-10-11 · official wordmark from the company profile p.37 (brand-sources/client-logos/approved/IMPERIO_Approved_Wordmark.png)"
+ },
+ "aqua": {
+  "label": "Aqua Software",
+  "tone": "light",
+  "size": [
+   225,
+   81
+  ]
+ },
+ "abnaa-alsheikh": {
+  "label": "أبناء الشيخ — Abnaa Al Sheikh",
+  "tone": "light",
+  "size": [
+   322,
+   170
+  ],
+  "approved": "2026-10-11 · logo from page 1 of the brand identity PDF sent by the owner (brand-sources/client-logos/abnaa-alsheikh/)"
+ },
+ "bright-smile": {
+  "label": "Bright Smile Dental",
+  "tone": "light",
+  "size": [
+   156,
+   170
+  ]
+ },
+ "islam-salon": {
+  "label": "Islam Salon",
+  "tone": "light",
+  "size": [
+   196,
+   170
+  ]
+ },
+ "fitness-times": {
+  "label": "Fitness Times",
+  "tone": "dark",
+  "size": [
+   152,
+   170
+  ]
+ },
+ "mix-grill": {
+  "label": "Mix Grill",
+  "tone": "light",
+  "size": [
+   122,
+   119
+  ]
+ },
+ "tabiq-lahem": {
+  "label": "Tabiq Lahem",
+  "tone": "light",
+  "size": [
+   193,
+   170
+  ]
+ },
+ "ayoub": {
+  "label": "Ayoub Dental Clinic",
+  "tone": "light",
+  "size": [
+   99,
+   124
+  ]
+ },
+ "artimal": {
+  "label": "Artimal Gifts",
+  "tone": "light",
+  "size": [
+   154,
+   170
+  ]
+ },
+ "reem-shawarma": {
+  "label": "Reem Shawarma",
+  "tone": "dark",
+  "size": [
+   153,
+   135
+  ]
+ }
+}
