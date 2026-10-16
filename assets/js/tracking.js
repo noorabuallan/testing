@@ -18,6 +18,9 @@
     TIKTOK_PIXEL_ID: "",      // مثال: "CXXXXXXXXXXXXXXX"
     ATTRIBUTION_DAYS: 90      // مدة الاحتفاظ بمصدر الزيارة
   };
+  // On WordPress the IDs come from «إعدادات MKN» (window.MKN_CONFIG.tracking, printed by the theme)
+  var SET = (window.MKN_CONFIG && window.MKN_CONFIG.tracking) || {};
+  for (var sk in SET) if (Object.prototype.hasOwnProperty.call(SET, sk) && SET[sk] && Object.prototype.hasOwnProperty.call(CONFIG, sk)) CONFIG[sk] = String(SET[sk]);
 
   var w = window, d = document;
   w.dataLayer = w.dataLayer || [];

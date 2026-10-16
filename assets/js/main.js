@@ -3,6 +3,12 @@
   // ===== إعدادات التواصل — عدّلها هنا =====
   var WHATSAPP_NUMBER = "201140552627"; // رقم واتساب بالصيغة الدولية بدون + أو 00
   var EMAIL = "contact@mknarabia.com";
+  var LEAD_URL = "lead.php";
+  // On WordPress these come from «إعدادات MKN» (window.MKN_CONFIG, printed by the theme)
+  var CFG = window.MKN_CONFIG || {};
+  if (CFG.wa) WHATSAPP_NUMBER = CFG.wa;
+  if (CFG.email) EMAIL = CFG.email;
+  if (CFG.leadUrl) LEAD_URL = CFG.leadUrl;
 
   var html = document.documentElement, body = document.body;
   var mqMobile = window.matchMedia ? window.matchMedia("(max-width: 640px)") : { matches: false, addEventListener: function () {} };
@@ -281,7 +287,7 @@
       fd.append("landing", (window.MKN && window.MKN.attribution().landing_page) || location.pathname);
       var mailed;
       try {
-        mailed = fetch("lead.php", { method: "POST", body: fd, keepalive: true })
+        mailed = fetch(LEAD_URL, { method: "POST", body: fd, keepalive: true })
           .then(function (res) { return res.ok ? res.json() : { ok: false }; })
           .then(function (j) { return !!(j && j.ok); }, function () { return false; });
       } catch (e) { mailed = Promise.resolve(false); }
