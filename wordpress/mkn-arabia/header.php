@@ -19,6 +19,8 @@ $mkn_slug    = mkn_current_slug();
 $mkn_section = '';
 if ( 'testimonials' === $mkn_slug ) {
 	$mkn_section = 'work';
+} elseif ( 0 === strpos( $mkn_slug, 'services/' ) ) {
+	$mkn_section = 'services';
 } elseif ( is_singular( 'post' ) || is_archive() || is_search() ) {
 	$mkn_section = 'insights';
 }

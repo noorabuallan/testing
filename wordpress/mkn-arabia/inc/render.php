@@ -86,7 +86,7 @@ function mkn_fill_placeholders( $html ) {
 		'{{linkedin_founder}}' => esc_url( mkn_opt( 'linkedin_founder' ) ),
 	);
 	$html = strtr( $html, $map );
-	$html = preg_replace_callback( '/\{\{u:([a-z0-9-]+)\}\}/', function ( $m ) {
+	$html = preg_replace_callback( '/\{\{u:([a-z0-9\/-]+)\}\}/', function ( $m ) {
 		return esc_url( mkn_url( $m[1] ) );
 	}, $html );
 	return preg_replace_callback( '/\{\{post:([a-z0-9-]+)\}\}/', function ( $m ) {
@@ -96,8 +96,8 @@ function mkn_fill_placeholders( $html ) {
 
 /** A designed page with its dynamic parts filled in. */
 function mkn_fragment( $slug ) {
-	$file = MKN_DIR . '/fragments/' . $slug . '.html';
-	if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) || ! is_readable( $file ) ) {
+	$file = MKN_DIR . '/fragments/' . str_replace( '/', '__', $slug ) . '.html';
+	if ( ! preg_match( '/^[a-z0-9-]+(\/[a-z0-9-]+)?$/', $slug ) || ! is_readable( $file ) ) {
 		return '';
 	}
 	$html = (string) file_get_contents( $file );

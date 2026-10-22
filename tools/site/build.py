@@ -209,7 +209,7 @@ def header(active, section=None):
 </header>'''
 
 def footer():
-    dl = "".join(f'<li><a href="services.html#{d["code"].lower()}"><span class="ltr">{d["code"]}</span> · {d["short"]}</a></li>' for d in DEPTS)
+    dl = "".join(f'<li><a href="services/{SVC_SLUG_EARLY[d["code"].lower()]}.html"><span class="ltr">{d["code"]}</span> · {d["short"]}</a></li>' for d in DEPTS)
     return f'''<footer class="footer">
   <img class="footer__mark" src="assets/img/logo-white.png" alt="" width="620" height="210" loading="lazy">
   <div class="container">
@@ -229,6 +229,7 @@ def footer():
           <li><a href="work.html">أعمالنا</a></li>
           <li><a href="testimonials.html">آراء العملاء</a></li>
           <li><a href="insights.html">المقالات</a></li>
+          <li><a href="markets.html">الأسواق: الخليج</a></li>
         </ul>
       </div>
       <div>
@@ -424,8 +425,9 @@ CASES = [
 ]
 
 # ===================== HOME =====================
+SVC_SLUG_EARLY = {"d01": "growth-strategy", "d02": "branding", "d03": "content", "d04": "paid-ads", "d05": "websites", "d06": "seo-geo", "d07": "crm-automation", "d08": "custom-software"}
 axes_html = "".join(f'<div class="cell spot reveal"><span class="label">{a}</span><h3>{t}</h3><p>{d}</p></div>' for a, t, d in AXES)
-dept_cells = "".join(f"""<a href="services.html#{d["code"].lower()}" class="cell spot reveal"><span class="label" aria-hidden="true">{d["code"]} · {d["axis"]}</span><span class="go" aria-hidden="true">←</span><h3>{d["short"]}</h3><p>{d["fit"]}</p></a>""" for d in DEPTS)
+dept_cells = "".join(f"""<a href="services/{SVC_SLUG_EARLY[d["code"].lower()]}.html" class="cell spot reveal"><span class="label" aria-hidden="true">{d["code"]} · {d["axis"]}</span><span class="go" aria-hidden="true">←</span><h3>{d["short"]}</h3><p>{d["fit"]}</p></a>""" for d in DEPTS)
 PROB_HEAD = ("المشكلة", "ما نفعله", "ما تحصل عليه")
 prob_rows = "".join(f'<tr><td data-label="{PROB_HEAD[0]}"><span class="label">0{i}</span>{a}</td><td data-label="{PROB_HEAD[1]}">{b}</td><td data-label="{PROB_HEAD[2]}">{c}</td></tr>' for i, (a, b, c) in enumerate(PROBLEMS, 1))
 LOOP_FLOW = '<ol class="loop-flow">' + "".join(f"<li>{t}</li>" for t, _, _ in LOOP) + "</ol>"
@@ -725,6 +727,7 @@ CASE_NAME = {cid: n for cid, n, _ in CASES}
 DEPT_BY_KEY = {d["code"].lower(): d for d in DEPTS}
 BUNDLE_NAME = {x.lower(): t for x, t, *_ in BUNDLES}
 DEPT_CASES = {}
+SVC_SLUG = {"d01": "growth-strategy", "d02": "branding", "d03": "content", "d04": "paid-ads", "d05": "websites", "d06": "seo-geo", "d07": "crm-automation", "d08": "custom-software"}
 for _cid, (_ds, _x) in CASE_LINKS.items():
     for _k in _ds: DEPT_CASES.setdefault(_k, []).append(_cid)
 ART = {a["slug"]: a for a in ARTICLES}
@@ -753,8 +756,8 @@ for d in DEPTS:
       {work_row}{read_row}
     </div>
     <div class="hero__actions" style="margin-top:28px">
-      <a href="pricing.html#{key}" class="btn btn--dark btn--sm">الباقات وعرض السعر</a>
-      <a href="#" data-wa="مرحباً MKN ARABIA، أرغب بالاستفسار عن {d["short"]} ({d["code"]})" class="btn btn--ghost btn--sm">استفسر عبر واتساب</a>
+      <a href="services/{SVC_SLUG[key]}.html" class="btn btn--dark btn--sm">تفاصيل الخدمة</a>
+      <a href="pricing.html#{key}" class="btn btn--ghost btn--sm">الباقات وعرض السعر</a>
     </div>
   </div>
   <div>
@@ -1215,7 +1218,7 @@ page("about.html", "من نحن: وكالة تسويق رقمي عربية لل�
 
 # ===================== CONTACT =====================
 opts = "".join(f'<option value="{d["code"]} · {d["short"]}">{d["short"]}</option>' for d in DEPTS)
-FAQ = [("ما الدول التي تخدمونها؟","السعودية والإمارات والأردن وفلسطين ومصر، وأسواق الخليج والشرق الأوسط ضمن نطاق مخصص لكل مشروع."),("هل أحتاج إلى جميع الخدمات؟","لا. يبدأ النطاق بما يحتاجه العمل فعليًا، وقد يكون خدمة واحدة أو مجموعة أعمال مترابطة."),
+FAQ = [("ما الدول التي تخدمونها؟","السعودية والإمارات وقطر والكويت والبحرين وسلطنة عُمان، إضافة إلى الأردن وفلسطين ومصر. نعمل عن بُعد من مقرنا في الأردن، ولكل سوق خليجي صفحة توضح طريقة العمل."),("هل أحتاج إلى جميع الخدمات؟","لا. يبدأ النطاق بما يحتاجه العمل فعليًا، وقد يكون خدمة واحدة أو مجموعة أعمال مترابطة."),
        ("هل تشمل الأتعاب الإنفاق الإعلاني؟","يُفصل الإنفاق ويدفع للمنصة مباشرة، إلا إذا نص العرض على آلية أخرى واضحة."),
        ("هل تشمل المواد التصوير؟","الإنتاج من مواد العميل حسب النطاق. التصوير والممثلون والموسيقى المدفوعة والمواد المرخصة تبين في إضافة مستقلة."),
        ("هل تضمنون البيع أو الترتيب؟","نلتزم بمخرجات محددة وقياس وتحسين. النتائج تعتمد أيضًا على العرض والسوق والميزانية وتشغيل العميل."),
@@ -1268,7 +1271,7 @@ contact = page_hero("LET'S START", "ابدأ التعاون.",
       </div>
       <div class="form-row">
         <div class="field"><label for="f-country">السوق المستهدف *</label>
-          <select id="f-country" name="country" required><option value="">اختر</option><option>السعودية</option><option>الإمارات</option><option>الأردن</option><option>فلسطين</option><option>مصر</option><option>سوق آخر في المنطقة</option></select>{field_err("country")}</div>
+          <select id="f-country" name="country" required><option value="">اختر</option><option>السعودية</option><option>الإمارات</option><option>قطر</option><option>الكويت</option><option>البحرين</option><option>سلطنة عُمان</option><option>الأردن</option><option>فلسطين</option><option>مصر</option><option>سوق آخر في المنطقة</option></select>{field_err("country")}</div>
         <div class="field"><label for="f-service">ما الذي تحتاجه؟ *</label>
           <select id="f-service" name="service" required><option value="">اختر</option><option value="UNSURE · غير متأكد">غير متأكد — أحتاج تشخيصًا</option>{opts}<option value="X01–X08 · حل متكامل">حل متكامل يجمع أكثر من خدمة</option></select>{field_err("service")}</div>
       </div>
@@ -1527,7 +1530,240 @@ nf = '''<section class="page-hero grain" style="min-height:80vh;display:grid;pla
 </section>'''
 page("404.html", "الصفحة غير موجودة | MKN ARABIA", "الصفحة غير موجودة", "", nf)
 
-SITEMAP_PAGES = ["", "services.html", "pricing.html", "work.html", "testimonials.html", "insights.html", "about.html", "contact.html", "privacy.html"] + [f"insights/{a['slug']}.html" for a in ARTICLES]
+# ===================== SERVICE PAGES & GULF MARKETS =====================
+# One indexable page per service area and per Gulf market. Built only from the approved service data:
+# no prices, no local offices, no results or clients that are not published elsewhere on the site.
+SERVICE_SLUG = SVC_SLUG
+GCC = [  # slug, short, official, label, ISO, main cities
+    ("saudi-arabia", "السعودية", "المملكة العربية السعودية", "SAUDI ARABIA", "SA", "الرياض وجدة والدمام"),
+    ("uae", "الإمارات", "الإمارات العربية المتحدة", "UAE", "AE", "دبي وأبوظبي والشارقة"),
+    ("qatar", "قطر", "دولة قطر", "QATAR", "QA", "الدوحة"),
+    ("kuwait", "الكويت", "دولة الكويت", "KUWAIT", "KW", "مدينة الكويت"),
+    ("bahrain", "البحرين", "مملكة البحرين", "BAHRAIN", "BH", "المنامة"),
+    ("oman", "سلطنة عُمان", "سلطنة عُمان", "OMAN", "OM", "مسقط"),
+]
+GROWTH_META = {}  # page file -> extra data for the WordPress theme (schema)
+
+def svc_url(key):
+    return f"services/{SERVICE_SLUG[key]}.html"
+
+def faq_block(items, label="FAQ"):
+    rows = "".join(f'<details{" open" if i == 1 else ""}><summary><span class="label">Q{i:02d}</span>{q}</summary><p>{a}</p></details>' for i, (q, a) in enumerate(items, 1))
+    return f'''<section class="section section--white">
+  <div class="container" style="max-width:900px">
+    <div class="heading"><span class="label">{label}</span><h2>أسئلة شائعة.</h2></div>
+    <div class="faq">{rows}</div>
+  </div>
+</section>'''
+
+SEO_GEO_EXTRA = """
+<section class="section section--white">
+  <div class="container">
+    <div class="heading">
+      <span class="label">SEARCH · MAPS · AI ANSWERS</span>
+      <h2 id="h-geo">الظهور في Google وفي إجابات الذكاء الاصطناعي.</h2>
+      <p>يبحث العميل اليوم في Google وخرائطه، ويسأل أيضًا مساعدات مثل ChatGPT وGemini وPerplexity وCopilot. لا توجد طريقة تضمن الترتيب أو الذكر في إجابة بعينها؛ ما نعمل عليه هو ما يجعل الموقع قابلًا للاكتشاف والفهم والاستشهاد، ثم نقيس أثره على الطلب.</p>
+    </div>
+    <div class="grid g4 swipe" data-lb="h-geo">
+      <div class="cell reveal"><span class="label">01 · ACCESS</span><h3>الإتاحة والفهرسة</h3><p>صفحات قابلة للزحف وخريطة موقع سليمة وروابط داخلية واضحة، ومراجعة Search Console وBing Webmaster Tools.</p></div>
+      <div class="cell reveal"><span class="label">02 · CLARITY</span><h3>محتوى يجيب بوضوح</h3><p>صفحة لكل خدمة وسوق: ماذا تقدم، لمن، بأي نطاق وحدود، مع أمثلة حقيقية وأسئلة يطرحها العملاء فعلًا.</p></div>
+      <div class="cell reveal"><span class="label">03 · ENTITY</span><h3>هوية واضحة للمؤسسة</h3><p>بيانات منظمة تطابق ما يراه الزائر، واتساق الاسم والوصف والروابط بين الموقع وملف Google والحسابات الرسمية.</p></div>
+      <div class="cell reveal"><span class="label">04 · MEASURE</span><h3>من الظهور إلى الطلب</h3><p>نفصل الظهور والنقر عن التواصل والطلب المؤهل، ونتابع الإحالات من محركات البحث ومنصات الذكاء الاصطناعي في GA4.</p></div>
+    </div>
+  </div>
+</section>"""
+
+def service_page(d):
+    key = d["code"].lower()
+    subs = "".join(f'<div class="cell reveal"><span class="label">{en}</span><h3>{t}</h3><p>{s}</p></div>' for t, en, s in d["subs"])
+    tiers = ""
+    for ar, en, _price, unit, _setup, goal, spec in TIERS[d["code"]]:
+        lis = "".join(f'<li><span>{k}</span>{v}</li>' for k, v in spec if "الإنفاق" not in k)
+        tiers += f'<div class="cell reveal"><span class="label">{en} · {unit}</span><h3>{ar}</h3><p>{goal}</p><ul class="spec" style="margin-top:14px">{lis}</ul></div>'
+    cases = DEPT_CASES.get(key, [])
+    work = ""
+    if cases:
+        work = '<div class="windex">' + "".join(f'<a href="work.html#{c}"><span class="n">{i:02d}</span><strong>{CASE_NAME[c]}</strong><span class="s">{next(s_ for cid, _, s_ in CASES if cid == c)}</span></a>' for i, c in enumerate(cases, 1)) + "</div>"
+    read = DEPT_READ.get(key)
+    read_html = f'<p style="margin-top:22px">اقرأ أيضًا: <a href="insights/{read["slug"]}.html">{read["title"]}</a></p>' if read else ""
+    markets = " · ".join(f'<a href="markets/{m[0]}.html">{m[1]}</a>' for m in GCC)
+    durations = "؛ ".join(f'{ar}: {dict(spec).get("المدة") or dict(spec).get("التعاقد") or unit}' for ar, _e, _p, unit, _s, _g, spec in TIERS[d["code"]])
+    faqs = [
+        (f"ما الذي تشمله خدمة {d['short']}؟", f"{len(d['subs'])} خدمات بمخرجات محددة: " + "، ".join(t for t, _, _ in d["subs"]) + ". يُحدد النطاق النهائي في عرض مكتوب قبل البدء."),
+        ("كم يستغرق التنفيذ؟", f"يختلف حسب النطاق. المدد التقديرية للنطاقات الثلاثة: {durations}. تبدأ المدة بعد اكتمال المدخلات والوصول والدفعة المتفق عليها."),
+        ("هل تقدمون الخدمة لشركات في الخليج من خارج بلدها؟", "نعم. مقرنا في الأردن ونعمل عن بُعد مع عملاء في السعودية والإمارات وقطر والكويت والبحرين وسلطنة عُمان، عبر اجتماعات Google Meet وواتساب ومراحل اعتماد مكتوبة."),
+        ("ما الذي لا يدخل في النطاق؟", f"{d['special']} ويُتفق على أي بند خارج النطاق كتابةً قبل تنفيذه."),
+        ("كيف أحصل على عرض سعر؟", "احجز استشارة مجانية مدتها 30 دقيقة أو أرسل احتياجك عبر النموذج أو واتساب؛ نراجع الهدف والسوق والمدخلات ونرسل عرضًا بالمخرجات والمدة والأتعاب."),
+    ]
+    body = page_hero(f"SERVICE · {d['code']} · {d['axis']}", d["t"] + ".", d["lead"], actions=True) + f'''
+<section class="section section--aura">
+  <div class="container">
+    <div class="heading"><span class="label">WHO IT IS FOR</span><h2 id="h-fit">لمن هذه الخدمة.</h2></div>
+    <div class="grid g3 swipe" data-lb="h-fit">
+      <div class="cell reveal"><span class="label">FIT</span><h3>العميل المناسب</h3><p>{d["fit"]}</p></div>
+      <div class="cell reveal"><span class="label">PROBLEM</span><h3>المشكلة</h3><p>{d["prob"]}</p></div>
+      <div class="cell reveal"><span class="label">SUCCESS</span><h3>كيف نقيس النجاح</h3><p>{d["measure"]}</p></div>
+    </div>
+  </div>
+</section>
+<section class="section section--white">
+  <div class="container">
+    <div class="heading"><span class="label">{len(d["subs"]):02d} SERVICES · DEFINED DELIVERABLES</span><h2 id="h-subs">ما الذي نقدمه.</h2><p>كل خدمة لها مخرجات وكميات وحدود مكتوبة، وتُجمع في نطاق واحد حسب احتياجك.</p></div>
+    {SWIPE_HINT}<div class="grid g3 swipe" data-lb="h-subs">{subs}</div>
+    <p class="note" style="margin-top:22px"><span><b>{d["special_label"]}:</b> {d["special"]}</span></p>
+  </div>
+</section>{SEO_GEO_EXTRA if key == "d06" else ""}
+<section class="section section--dark grain">
+  {grid_lines("c")}
+  <div class="container">
+    <div class="heading"><span class="label">3 SCOPES · CUSTOM QUOTE</span><h2 style="color:#fff" id="h-scopes">ثلاثة نطاقات للبدء.</h2><p>«تأسيس» و«نمو» و«توسع» تصف حجم الاحتياج لا مستوى الجودة. الأتعاب في عرض مخصص بعد اعتماد النطاق.</p></div>
+    <div class="grid g3 swipe" data-lb="h-scopes">{tiers}</div>
+    <div class="hero__actions" style="margin-top:32px">
+      <a href="pricing.html#{key}" class="btn btn--blue">تفاصيل الباقات وطلب عرض سعر</a>
+      <a href="#" data-wa="مرحباً MKN ARABIA، أرغب بعرض سعر لخدمة {d["short"]} ({d["code"]})" data-quote="{d["code"]}" data-quote-name="{d["short"]}" data-dept="{d["code"]}" class="btn btn--line">اطلب عرضًا عبر واتساب</a>
+    </div>
+  </div>
+</section>
+<section class="section section--aura">
+  <div class="container">
+    <div class="heading"><span class="label">METHOD</span><h2>كيف نعمل.</h2></div>
+    <div class="grid g3">{method_html}</div>
+    {('<h3 style="margin:44px 0 16px;font-size:22px">من أعمالنا في هذا المجال</h3>' + work) if work else ""}
+    {read_html}
+    <p style="margin-top:22px"><b>نخدم الشركات في:</b> {markets} · <a href="markets.html">كل الأسواق</a></p>
+  </div>
+</section>
+{faq_block(faqs)}
+{CTA}'''
+    fname = svc_url(key)
+    title = f"{d['short']} للشركات في السعودية والخليج | MKN ARABIA"
+    desc = f"{d['lead']} {len(d['subs'])} خدمات بمخرجات محددة لشركات السعودية والإمارات وقطر والكويت والبحرين وعُمان."
+    GROWTH_META[fname] = {"kind": "service", "name": d["t"], "short": d["short"], "code": d["code"], "offers": [t for t, _, _ in d["subs"]], "faq": faqs}
+    page(fname, title, desc, "", body, section="services.html")
+
+for _d in DEPTS:
+    service_page(_d)
+
+# ---------- markets ----------
+MARKET_ANGLE = {
+    "saudi-arabia": ("أغلب أعمالنا المنشورة من السعودية: مراكز تجميل وعافية في الرياض وجدة، وفعاليات B2B، وتقنية.",
+                     ["قنوات الحجز المستخدمة فعليًا (Fresha أو نظام الحجز أو واتساب) وكيف تُقاس.",
+                      "الظهور في خرائط Google لكل فرع أو مدينة بشكل منفصل.",
+                      "المتاجر على سلة أو زد أو Shopify وربطها بالحملات والقياس.",
+                      "المحتوى بالعربية بلغة قريبة من جمهور كل مدينة وقطاع."]),
+    "uae": ("من عملائنا في الإمارات E SPA Dubai، ونقدم لشركات الإمارات هوية ومواقع ومحتوى وإعلانات وتوليد طلب.",
+            ["جمهور متعدد اللغات: متى تحتاج الصفحات والإعلانات نسخة عربية وإنجليزية مستقلة.",
+             "الظهور المحلي في دبي وأبوظبي والشارقة حسب مكان الخدمة الفعلي.",
+             "مسار التواصل: واتساب، نموذج، أو حجز مباشر، وأيّها يمكن قياسه.",
+             "الاتساق بين الهوية والموقع والإعلانات في سوق شديد التنافس."]),
+    "qatar": ("نقدم لشركات قطر ما نقدمه في السعودية والإمارات: هوية وموقع ومحتوى وتوليد طلب، من خلال مراحل اعتماد واضحة.",
+              ["التقديم المؤسسي للشركات والجهات التي تخاطب صناع القرار (B2B).",
+               "الحاجة إلى نسخة إنجليزية للموقع والعروض المؤسسية.",
+               "مسار الاستفسار والمتابعة للطلبات المؤسسية بدل الاكتفاء بالمحادثات.",
+               "ما يتطلب حضورًا محليًا (تصوير، فعاليات) وكيف يُنسق مع مورد محلي."]),
+    "kuwait": ("نقدم لشركات الكويت هوية ومواقع ومحتوى وإعلانات وتنظيم متابعة الاستفسارات.",
+               ["تحويل الاستفسارات من واتساب وإنستغرام إلى متابعة منظمة يمكن قياسها.",
+                "الهوية والموقع للأعمال الخدمية والعلامات الجديدة.",
+                "المحتوى بالعربية بنبرة تناسب جمهور النشاط.",
+                "ما يحتاج تصويرًا أو إنتاجًا محليًا وكيف يُنسق."]),
+    "bahrain": ("نقدم خدماتنا لشركات البحرين، خصوصًا الشركات الخدمية وB2B التي تحتاج موقعًا واضحًا ومتابعة طلبات منظمة.",
+                ["موقع يشرح الخدمة ويقود إلى طلب واضح.",
+                 "ربط النموذج وواتساب بنظام متابعة أو CRM بحسب حجم الطلبات.",
+                 "النسخة العربية والإنجليزية للصفحات الأساسية عند الحاجة.",
+                 "الظهور في Google وخرائطه لمكان الخدمة الفعلي."]),
+    "oman": ("نقدم لشركات سلطنة عُمان موقعًا وهوية ومحتوى وظهورًا في البحث ومسار استفسار واضحًا.",
+             ["التمييز في المحتوى والبحث بين «عُمان» و«عمّان» عاصمة الأردن.",
+              "الظهور المحلي في مسقط أو مدينة الخدمة الفعلية.",
+              "موقع خدمي يجيب عن أسئلة العميل قبل التواصل.",
+              "تنظيم متابعة الاستفسارات وقياس مصدرها."]),
+}
+
+def market_page(m):
+    slug, short, official, label, iso, cities = m
+    intro, checks = MARKET_ANGLE[slug]
+    code = {"saudi-arabia": "sa", "uae": "ae"}.get(slug)
+    quotes = sorted([t for t in TESTIMONIALS if t["country"] == code], key=lambda t: not (t["featured"] or t["case"]))[:3] if code else []
+    proof = ""
+    if quotes:
+        cards = f"[[proof_quotes|{','.join(html.unescape(t['brand']) for t in quotes)}]]" if THEME else "".join(tcard(t) for t in quotes)
+        proof = f'''<div class="grid g3" style="margin-top:20px">{cards}</div>
+    <p style="margin-top:16px"><a href="testimonials.html#{code}" class="arrow">كل آراء العملاء في {short} </a></p>'''
+    else:
+        proof = f'<p class="note"><span>لم ننشر بعد دراسات حالة أو آراء عملاء من {short}. نعرض أعمالنا في السعودية والإمارات والأردن وفلسطين كما هي، بموافقة أصحابها، دون نسبتها إلى سوق آخر.</span></p>'
+    cases_html = ""
+    if slug == "saudi-arabia":
+        sa_cases = ["les-senes", "beautiful-shine", "cryo", "osus", "imperio", "mireva"]
+        cases_html = '<div class="windex" style="margin-top:20px">' + "".join(f'<a href="work.html#{c}"><span class="n">{i:02d}</span><strong>{CASE_NAME[c]}</strong><span class="s">{next(s_ for cid, _, s_ in CASES if cid == c)}</span></a>' for i, c in enumerate(sa_cases, 1)) + "</div>"
+    svc_cells = "".join(f'<a href="{svc_url(d["code"].lower())}" class="cell spot reveal"><span class="label" aria-hidden="true">{d["code"]} · {d["axis"]}</span><span class="go" aria-hidden="true">←</span><h3>{d["short"]}</h3><p>{d["fit"]}</p></a>' for d in DEPTS)
+    checks_html = "".join(f"<li>{c}</li>" for c in checks)
+    faqs = [
+        (f"هل لديكم مكتب في {short}؟", f"لا. مقر MKN ARABIA في الأردن، ونخدم عملاءنا في {official} عن بُعد عبر اجتماعات Google Meet وواتساب وملفات مشتركة ومراحل اعتماد مكتوبة."),
+        ("كيف تتم الاستشارة الأولى؟", "استشارة مجانية مدتها 30 دقيقة مع المؤسس عبر Google Meet، نراجع فيها الهدف والسوق والوضع الحالي ونقترح نقطة البداية."),
+        ("هل تكتبون المحتوى بالعربية والإنجليزية؟", "نعم. العربية أساس عملنا، ونضيف الإنجليزية للصفحات والمواد التي تحتاجها، ضمن النطاق المتفق عليه."),
+        ("ماذا عن التصوير والإنتاج داخل البلد؟", "إذا احتاج المشروع تصويرًا أو حضورًا ميدانيًا نحدد ذلك في النطاق، ويُنفذ عبر فريق العميل أو مورد محلي ننسق معه، ويُتفق على تكلفته منفصلًا."),
+        ("بماذا نبدأ؟", "غالبًا بتشخيص سريع: الموقع والحضور والإعلانات ومسار التواصل، ثم خطة بأولويات واضحة قبل أي تنفيذ واسع."),
+    ]
+    body = page_hero(f"MARKETS · {label}", f"تسويق رقمي للشركات في {short}.",
+        f"{intro} نخدم الشركات في {cities} وبقية مدن {short} عن بُعد، بمخرجات ومدد مكتوبة.", actions=True) + f'''
+<section class="section section--aura">
+  <div class="container">
+    <div class="heading"><span class="label">SERVICES</span><h2 id="h-msvc">ما نقدمه لشركات {short}.</h2><p>ثمانية مجالات خدمة، تبدأ بما يحتاجه نشاطك فعليًا.</p></div>
+    {SWIPE_HINT}<div class="grid g4 swipe" data-lb="h-msvc">{svc_cells}</div>
+  </div>
+</section>
+<section class="section section--white">
+  <div class="container contact-grid">
+    <div>
+      <span class="label">HOW WE WORK</span>
+      <h2 style="margin:10px 0 16px">كيف نعمل مع شركات {short}.</h2>
+      <ul class="spec">
+        <li><span>المقر</span><div>الأردن · نخدم {official} عن بُعد</div></li>
+        <li><span>الاجتماعات</span><div>Google Meet بمواعيد تناسب توقيت الخليج</div></li>
+        <li><span>التواصل</span><div>واتساب وبريد إلكتروني · نرد خلال يوم عمل</div></li>
+        <li><span>الاعتماد</span><div>عرض مكتوب، ثم مراحل اعتماد ومحضر تسليم لكل مخرج</div></li>
+        <li><span>اللغة</span><div>العربية، والإنجليزية حسب الحاجة</div></li>
+      </ul>
+    </div>
+    <div>
+      <span class="label">WHAT WE CHECK FIRST</span>
+      <h2 style="margin:10px 0 16px">ما نراجعه قبل البدء.</h2>
+      <ul class="checks">{checks_html}</ul>
+    </div>
+  </div>
+</section>
+<section class="section section--aura">
+  <div class="container">
+    <div class="heading"><span class="label">PROOF</span><h2>من أعمالنا وآراء العملاء.</h2></div>
+    {cases_html}{proof}
+  </div>
+</section>
+{faq_block(faqs)}
+{CTA}'''
+    fname = f"markets/{slug}.html"
+    title = f"تسويق رقمي للشركات في {short} | MKN ARABIA"
+    desc = f"MKN ARABIA تخدم الشركات في {official} عن بُعد: استراتيجية، هوية، محتوى، إعلانات، مواقع، ظهور في البحث وCRM، بمخرجات ومدد مكتوبة."
+    GROWTH_META[fname] = {"kind": "market", "name": f"خدمات التسويق الرقمي للشركات في {short}", "country": official, "iso": iso, "faq": faqs}
+    page(fname, title, desc, "", body)
+
+for _m in GCC:
+    market_page(_m)
+
+markets_cards = "".join(f'<a href="markets/{m[0]}.html" class="cell spot reveal"><span class="label" aria-hidden="true">{m[3]}</span><span class="go" aria-hidden="true">←</span><h3>{m[1]}</h3><p>{m[5]}</p></a>' for m in GCC)
+markets_hub = page_hero("MARKETS · GCC", "الأسواق التي نخدمها.",
+    "نخدم الشركات في السعودية والإمارات وقطر والكويت والبحرين وسلطنة عُمان عن بُعد من مقرنا في الأردن، ولدينا عملاء أيضًا في الأردن وفلسطين ومصر.", actions=True) + f'''
+<section class="section section--aura">
+  <div class="container">
+    <div class="heading"><span class="label">6 GCC MARKETS</span><h2 id="h-mk">اختر سوقك.</h2><p>لكل سوق صفحة توضح طريقة العمل وما نراجعه قبل البدء، والأعمال المنشورة منه إن وجدت.</p></div>
+    {SWIPE_HINT}<div class="grid g3 swipe" data-lb="h-mk">{markets_cards}</div>
+    <p class="note" style="margin-top:22px"><span>لا نملك مكاتب أو فروعًا في هذه الدول؛ نعمل عن بُعد، وننسق مع موردين محليين عند الحاجة إلى تصوير أو حضور ميداني.</span></p>
+  </div>
+</section>
+{CTA}'''
+GROWTH_META["markets.html"] = {"kind": "markets", "name": "الأسواق التي تخدمها MKN ARABIA"}
+page("markets.html", "الأسواق: السعودية والإمارات وقطر والكويت والبحرين وعُمان | MKN ARABIA",
+     "MKN ARABIA تخدم الشركات في دول الخليج الست عن بُعد من الأردن. تعرّف على طريقة العمل في كل سوق.", "", markets_hub)
+
+SITEMAP_PAGES = ["", "services.html", "pricing.html", "work.html", "testimonials.html", "insights.html", "about.html", "contact.html", "privacy.html", "markets.html"] + [f"insights/{a['slug']}.html" for a in ARTICLES] + [svc_url(k) for k in SERVICE_SLUG] + [f"markets/{m[0]}.html" for m in GCC]
 LASTMOD = "2026-10-11"
 with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
@@ -1538,7 +1774,10 @@ with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
 # ===================== WORDPRESS THEME EXPORT =====================
 SLUG_OF = {"index.html": "home", "services.html": "services", "pricing.html": "pricing", "work.html": "work",
            "testimonials.html": "testimonials", "insights.html": "insights", "about.html": "about", "contact.html": "contact",
-           "privacy.html": "privacy", "utm.html": "utm", "404.html": "404"}
+           "privacy.html": "privacy", "utm.html": "utm", "404.html": "404", "markets.html": "markets"}
+SLUG_OF.update({svc_url(k): "services/" + v for k, v in SERVICE_SLUG.items()})
+SLUG_OF.update({f"markets/{m[0]}.html": "markets/" + m[0] for m in GCC})
+NAV_TITLE = {"services": "الخدمات", "markets": "الأسواق"}
 CONTACT_LITERALS = [  # site-wide contact details become settings in WordPress
     (BOOK_EMBED, "{{book_embed}}"), (BOOK, "{{book}}"),
     ("https://www.linkedin.com/in/noureddinabuallan", "{{linkedin_founder}}"),
@@ -1553,7 +1792,8 @@ def to_fragment(body):
     body = re.sub(r'(href|src)="assets/', r'\1="{{a}}/', body)
     body = re.sub(r'href="\./"', 'href="{{u:home}}"', body)
     body = re.sub(r'href="insights/([a-z0-9-]+)\.html"', r'href="{{post:\1}}"', body)
-    body = re.sub(r'href="(services|pricing|work|testimonials|insights|about|contact|privacy|utm)\.html', r'href="{{u:\1}}', body)
+    body = re.sub(r'href="((?:services|markets)/[a-z0-9-]+)\.html', r'href="{{u:\1}}', body)
+    body = re.sub(r'href="(services|pricing|work|testimonials|insights|about|contact|privacy|utm|markets)\.html', r'href="{{u:\1}}', body)
     return body
 
 def article_html(a):
@@ -1571,9 +1811,14 @@ def export_theme():
         if fname not in SLUG_OF:
             continue
         slug = SLUG_OF[fname]
-        with open(os.path.join(THEME_DIR, "fragments", f"{slug}.html"), "w", encoding="utf-8") as f:
+        with open(os.path.join(THEME_DIR, "fragments", slug.replace("/", "__") + ".html"), "w", encoding="utf-8") as f:
             f.write(to_fragment(pg["body"]))
         pages[slug] = {"title": pg["title"], "desc": pg["desc"]}
+        meta = GROWTH_META.get(fname)
+        if meta:
+            pages[slug].update(meta)
+        h1 = re.search(r"<h1>(.*?)</h1>", pg["body"], flags=re.S)
+        pages[slug]["h1"] = html.unescape(re.sub(r"<[^>]+>", "", h1.group(1))).strip().rstrip(".") if h1 else slug
     # windex sub-lines and home teasers for the cases
     sub_of = {cid: s_ for cid, _, s_ in CASES}
     teaser, card_alt = {}, {}
@@ -1607,7 +1852,7 @@ def export_theme():
         json.dump(seed, f, ensure_ascii=False, indent=1)
     site = {
         "nav": [["home" if h == "./" else h.replace(".html", ""), t] for h, t in NAV],
-        "depts": [{"code": d["code"], "key": d["code"].lower(), "short": d["short"]} for d in DEPTS],
+        "depts": [{"code": d["code"], "key": d["code"].lower(), "short": d["short"], "slug": SVC_SLUG[d["code"].lower()]} for d in DEPTS],
         "bundles": {x.lower(): t for x, t, *_ in BUNDLES},
         "countries": [list(c) for c in COUNTRIES],
         "pages": pages,

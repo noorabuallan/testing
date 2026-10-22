@@ -31,9 +31,19 @@ function mkn_seed( $key = null ) {
 	return isset( $seed[ $key ] ) ? $seed[ $key ] : array();
 }
 
-/** Page slugs that have a designed layout in fragments/. */
+/** Page paths that have a designed layout in fragments/ (services, markets/qatar …). */
 function mkn_page_slugs() {
-	return array( 'home', 'services', 'pricing', 'work', 'testimonials', 'insights', 'about', 'contact', 'privacy', 'utm' );
+	static $slugs = null;
+	if ( null === $slugs ) {
+		$slugs = array_values( array_diff( array_keys( (array) mkn_site( 'pages' ) ), array( '404' ) ) );
+	}
+	return $slugs;
+}
+
+/** Path of a page (parent/child), e.g. markets/qatar. */
+function mkn_page_path( $post ) {
+	$post = get_post( $post );
+	return $post ? get_page_uri( $post ) : '';
 }
 
 /** The slug of the designed page being shown, or '' for any other view. */
@@ -48,7 +58,7 @@ function mkn_current_slug() {
 		return '404';
 	}
 	if ( is_page() ) {
-		$slug = get_post_field( 'post_name', get_queried_object_id() );
+		$slug = mkn_page_path( get_queried_object_id() );
 		return in_array( $slug, mkn_page_slugs(), true ) ? $slug : '';
 	}
 	return '';

@@ -167,7 +167,7 @@ function mkn_json_ld() {
 				'sameAs'          => array_values( array_filter( array( mkn_opt( 'linkedin_founder' ) ) ) ),
 			),
 			'address'      => array( '@type' => 'PostalAddress', 'addressCountry' => 'JO' ),
-			'areaServed'   => array( 'SA', 'AE', 'JO', 'PS', 'EG' ),
+			'areaServed'   => mkn_area_served(),
 			'sameAs'       => $same,
 			'contactPoint' => array(
 				'@type'             => 'ContactPoint',
@@ -192,6 +192,8 @@ function mkn_json_ld() {
 			'inLanguage' => 'ar',
 			'publisher'  => array( '@id' => $org ),
 		);
+	} elseif ( mkn_current_slug() ) {
+		$out = array_merge( $out, mkn_page_ld( mkn_current_slug() ) );
 	} elseif ( is_singular( 'post' ) ) {
 		$post  = get_queried_object();
 		$publ  = array( '@type' => 'Organization', '@id' => $org, 'name' => 'MKN ARABIA', 'url' => $home );
@@ -253,7 +255,7 @@ add_action( 'add_meta_boxes', function ( $post_type ) {
 
 function mkn_seo_box( $post ) {
 	wp_nonce_field( 'mkn_seo', 'mkn_seo_nonce' );
-	$slug  = 'page' === $post->post_type ? $post->post_name : '';
+	$slug  = 'page' === $post->post_type ? mkn_page_path( $post ) : '';
 	$pages = (array) mkn_site( 'pages' );
 	$ph_t  = isset( $pages[ $slug ] ) ? $pages[ $slug ]['title'] : $post->post_title . ' | MKN ARABIA';
 	$ph_d  = isset( $pages[ $slug ] ) ? $pages[ $slug ]['desc'] : 'يُستخدم الملخص (Excerpt) عند ترك هذا الحقل فارغًا.';
@@ -273,3 +275,67 @@ add_action( 'save_post', function ( $post_id ) {
 	update_post_meta( $post_id, '_mkn_seo_title', sanitize_text_field( isset( $in['title'] ) ? (string) $in['title'] : '' ) );
 	update_post_meta( $post_id, '_mkn_seo_desc', sanitize_textarea_field( isset( $in['desc'] ) ? (string) $in['desc'] : '' ) );
 } );
+
+
+/** Countries served, as ISO codes (the six GCC markets plus the existing client markets). */
+function mkn_area_served() {
+	return array( 'SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'JO', 'PS', 'EG' );
+}
+
+/** Structured data for a designed page: Service for service and market pages, FAQ, breadcrumbs. */
+function mkn_page_ld( $slug ) {
+	$pages = (array) mkn_site( 'pages' );
+	$pg    = isset( $pages[ $slug ] ) ? $pages[ $slug ] : array();
+	$kind  = isset( $pg['kind'] ) ? $pg['kind'] : '';
+	$home  = home_url( '/' );
+	$url   = mkn_url( $slug );
+	$out   = array();
+	if ( 'service' === $kind || 'market' === $kind ) {
+		$area = 'market' === $kind
+			? array( '@type' => 'Country', 'name' => $pg['country'], 'identifier' => $pg['iso'] )
+			: array_map( function ( $c ) {
+				return array( '@type' => 'Country', 'identifier' => $c );
+			}, mkn_area_served() );
+		$svc = array(
+			'@context'    => 'https://schema.org',
+			'@type'       => 'Service',
+			'@id'         => $url . '#service',
+			'name'        => $pg['name'],
+			'description' => $pg['desc'],
+			'url'         => $url,
+			'provider'    => array( '@type' => 'Organization', '@id' => $home . '#org', 'name' => 'MKN ARABIA', 'url' => $home ),
+			'areaServed'  => $area,
+			'inLanguage'  => 'ar',
+		);
+		if ( ! empty( $pg['offers'] ) ) {
+			$svc['serviceType']     = $pg['short'];
+			$svc['hasOfferCatalog'] = array(
+				'@type'           => 'OfferCatalog',
+				'name'            => $pg['name'],
+				'itemListElement' => array_map( function ( $o ) {
+					return array( '@type' => 'Offer', 'itemOffered' => array( '@type' => 'Service', 'name' => $o ) );
+				}, $pg['offers'] ),
+			);
+		}
+		$out[] = $svc;
+	}
+	if ( ! empty( $pg['faq'] ) ) {
+		$out[] = array(
+			'@context'   => 'https://schema.org',
+			'@type'      => 'FAQPage',
+			'mainEntity' => array_map( function ( $qa ) {
+				return array( '@type' => 'Question', 'name' => wp_strip_all_tags( $qa[0] ), 'acceptedAnswer' => array( '@type' => 'Answer', 'text' => wp_strip_all_tags( $qa[1] ) ) );
+			}, $pg['faq'] ),
+		);
+	}
+	if ( 'home' !== $slug ) {
+		$crumbs = array( array( '@type' => 'ListItem', 'position' => 1, 'name' => 'الرئيسية', 'item' => $home ) );
+		if ( false !== strpos( $slug, '/' ) ) {
+			$parent   = dirname( $slug );
+			$crumbs[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => 'services' === $parent ? 'الخدمات' : 'الأسواق', 'item' => mkn_url( $parent ) );
+		}
+		$crumbs[] = array( '@type' => 'ListItem', 'position' => count( $crumbs ) + 1, 'name' => isset( $pg['h1'] ) ? $pg['h1'] : $slug );
+		$out[]    = array( '@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $crumbs );
+	}
+	return $out;
+}

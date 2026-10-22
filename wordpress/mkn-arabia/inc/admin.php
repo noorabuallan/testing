@@ -17,7 +17,7 @@ add_filter( 'post_type_labels_post', function ( $l ) {
 /** Is this page drawn from a designed layout (so its editor content is not shown)? */
 function mkn_is_designed_page( $post ) {
 	$post = get_post( $post );
-	return $post && 'page' === $post->post_type && in_array( $post->post_name, mkn_page_slugs(), true );
+	return $post && 'page' === $post->post_type && in_array( mkn_page_path( $post ), mkn_page_slugs(), true );
 }
 
 /* Designed pages open in the simple editor, with a note on where their content is edited. */
@@ -94,10 +94,14 @@ function mkn_import_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
-	$ran = false;
+	$ran  = false;
+	$sync = null;
 	if ( isset( $_POST['mkn_import'] ) && check_admin_referer( 'mkn_import' ) ) {
 		mkn_import_run( true );
 		$ran = true;
+	}
+	if ( isset( $_POST['mkn_sync'] ) && check_admin_referer( 'mkn_import' ) ) {
+		$sync = array( mkn_sync_designed_pages(), mkn_aioseo_sync( true ) );
 	}
 	$done = (int) get_option( 'mkn_seed_done' );
 	$log  = (array) get_option( 'mkn_seed_log', array() );
@@ -114,9 +118,14 @@ function mkn_import_page() {
 		}
 		echo '</ul>';
 	}
+	if ( null !== $sync ) {
+		echo '<div class="notice notice-success"><p>تمت المزامنة: ' . (int) $sync[0] . ' صفحة حُدّث عنوانها ونُقل نصها القديم إلى المراجعات، و' . (int) $sync[1] . ' عنوان/وصف كُتب في AIOSEO.</p></div>';
+	}
 	echo '<form method="post">';
 	wp_nonce_field( 'mkn_import' );
 	submit_button( 'إضافة المحتوى الناقص', 'secondary', 'mkn_import' );
+	echo '<hr><h2>مزامنة الصفحات المصممة</h2><p>إذا كان الموقع مبنيًا فوق موقع أقدم، قد تحمل الصفحات (الخدمات، أعمالنا، …) عناوين ونصوصًا قديمة لا تظهر للزوار لكن تقرؤها إضافات SEO وخريطة الموقع. هذا الزر يعطيها عناوين القالب، وينقل النص القديم إلى «المراجعات» (يمكن استرجاعه)، ويكتب العناوين والأوصاف في AIOSEO إن كانت مفعّلة.</p>';
+	submit_button( 'مزامنة الصفحات المصممة وعناوين Google', 'primary', 'mkn_sync' );
 	echo '</form></div>';
 }
 

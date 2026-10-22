@@ -10,7 +10,8 @@ defined( 'ABSPATH' ) || exit;
  */
 
 add_action( 'init', function () {
-	if ( 'done' !== get_option( 'mkn_seed_state' ) && ! wp_doing_ajax() && ! wp_installing() ) {
+	// First activation, or a theme update that ships new pages or content (adds only what is missing).
+	if ( ( 'done' !== get_option( 'mkn_seed_state' ) || MKN_VERSION !== get_option( 'mkn_seed_version' ) ) && ! wp_doing_ajax() && ! wp_installing() ) {
 		mkn_import_run();
 	}
 }, 20 );
@@ -30,15 +31,15 @@ add_filter( 'wp_insert_post_data', function ( $data, $postarr ) {
 	if ( ! empty( $postarr['ID'] ) && 'page' === $data['post_type'] ) {
 		$key = get_post_meta( (int) $postarr['ID'], '_mkn_seed_key', true );
 		if ( is_string( $key ) && 0 === strpos( $key, 'page:' ) ) {
-			$data['post_name'] = substr( $key, 5 );
+			$data['post_name'] = basename( substr( $key, 5 ) );
 		}
 	}
 	return $data;
 }, 10, 2 );
 
-/** Page slug => title for the designed pages. */
+/** Page path => title for the designed pages, parents before children. */
 function mkn_seed_pages() {
-	return array(
+	$titles = array(
 		'home'         => 'الرئيسية',
 		'services'     => 'الخدمات',
 		'pricing'      => 'الباقات',
@@ -49,7 +50,25 @@ function mkn_seed_pages() {
 		'contact'      => 'تواصل',
 		'privacy'      => 'سياسة الخصوصية',
 		'utm'          => 'منشئ روابط الحملات',
+		'markets'      => 'الأسواق',
 	);
+	$out = array();
+	foreach ( (array) mkn_site( 'pages' ) as $path => $pg ) {
+		if ( '404' === (string) $path ) {
+			continue;
+		}
+		if ( isset( $titles[ $path ] ) ) {
+			$out[ $path ] = $titles[ $path ];
+		} elseif ( ! empty( $pg['short'] ) ) {
+			$out[ $path ] = $pg['short'];
+		} else {
+			$out[ $path ] = isset( $pg['h1'] ) ? $pg['h1'] : basename( $path );
+		}
+	}
+	uksort( $out, function ( $a, $b ) {
+		return substr_count( $a, '/' ) - substr_count( $b, '/' );
+	} );
+	return $out;
 }
 
 /** Find an item created by a previous import (also in the trash). */
@@ -233,7 +252,11 @@ function mkn_import_run( $force = false ) {
 		if ( mkn_seed_skip( 'page:' . $slug, 'page' ) ) {
 			continue;
 		}
-		$id = mkn_seed_insert( array( 'post_type' => 'page', 'post_title' => $title, 'post_name' => $slug, 'post_content' => '', 'comment_status' => 'closed', 'ping_status' => 'closed', 'menu_order' => count( $ids ) ), 'page:' . $slug, array() );
+		$parent = false !== strpos( $slug, '/' ) ? dirname( $slug ) : '';
+		if ( $parent && empty( $ids[ $parent ] ) ) {
+			continue; // the parent page was removed on purpose
+		}
+		$id = mkn_seed_insert( array( 'post_type' => 'page', 'post_title' => $title, 'post_name' => basename( $slug ), 'post_parent' => $parent ? $ids[ $parent ] : 0, 'post_content' => '', 'comment_status' => 'closed', 'ping_status' => 'closed', 'menu_order' => count( $ids ) ), 'page:' . $slug, array() );
 		if ( $id ) {
 			$ids[ $slug ] = $id;
 		}
@@ -365,15 +388,63 @@ function mkn_import_run( $force = false ) {
 		) );
 	}
 
+	mkn_seed_categories();
+	mkn_seed_migrations();
 	if ( $first ) {
 		mkn_write_htaccess();
 	}
+	if ( function_exists( 'mkn_aioseo_sync' ) ) {
+		mkn_aioseo_sync( false );
+	}
 
-	update_option( 'mkn_seed_version', MKN_VERSION, false );
+	update_option( 'mkn_seed_version', MKN_VERSION, true );
 	update_option( 'mkn_seed_done', time(), false );
 	update_option( 'mkn_seed_state', 'done', true );
 	delete_option( 'mkn_seed_lock' );
 	mkn_flush_page_cache();
+}
+
+/**
+ * Text corrections shipped with a theme update. Each one changes an imported item only if it still
+ * holds the exact original text, so anything the owner edited is left alone.
+ */
+function mkn_seed_migrations() {
+	$changes = array(
+		array( 'faq:' . md5( 'ما الدول التي تخدمونها؟' ), 'mkn_faq', '_mkn_answer',
+			'السعودية والإمارات والأردن وفلسطين ومصر، وأسواق الخليج والشرق الأوسط ضمن نطاق مخصص لكل مشروع.',
+			'السعودية والإمارات وقطر والكويت والبحرين وسلطنة عُمان، إضافة إلى الأردن وفلسطين ومصر. نعمل عن بُعد من مقرنا في الأردن، ولكل سوق خليجي صفحة توضح طريقة العمل.' ),
+	);
+	foreach ( $changes as $c ) {
+		$id = mkn_seeded( $c[0], $c[1] );
+		if ( $id && get_post_meta( $id, $c[2], true ) === $c[3] ) {
+			update_post_meta( $id, $c[2], $c[4] );
+		}
+	}
+}
+
+/** Topic categories for the shipped articles (instead of «Uncategorized»), only where none was chosen. */
+function mkn_seed_categories() {
+	$names   = array(
+		'BUYER EDUCATION' => array( 'اختيار الشريك التسويقي', 'choosing-a-marketing-partner' ),
+		'LOCAL DISCOVERY' => array( 'البحث المحلي وخرائط Google', 'local-search' ),
+		'MEASUREMENT'     => array( 'القياس وقراءة النتائج', 'measurement' ),
+	);
+	$default = (int) get_option( 'default_category' );
+	foreach ( get_posts( array( 'post_type' => 'post', 'posts_per_page' => -1, 'post_status' => 'any', 'meta_key' => '_mkn_topic' ) ) as $p ) { // phpcs:ignore WordPress.DB.SlowDBQuery
+		$topic = mkn_meta( $p->ID, 'topic' );
+		$cats  = wp_get_post_categories( $p->ID );
+		if ( ! isset( $names[ $topic ] ) || array_diff( $cats, array( $default ) ) ) {
+			continue;
+		}
+		$term = get_term_by( 'slug', $names[ $topic ][1], 'category' );
+		$id   = $term ? $term->term_id : wp_insert_term( $names[ $topic ][0], 'category', array( 'slug' => $names[ $topic ][1] ) );
+		if ( is_array( $id ) ) {
+			$id = $id['term_id'];
+		}
+		if ( $id && ! is_wp_error( $id ) ) {
+			wp_set_post_categories( $p->ID, array( (int) $id ) );
+		}
+	}
 }
 
 /* /insights/page/2/ belongs to the articles page, not to an article called "page". */

@@ -51,7 +51,8 @@
 
 | الحدث | متى يُرسل | معاملات إضافية | Meta | TikTok | Google Ads |
 |---|---|---|---|---|---|
-| `generate_lead` | إرسال نموذج التواصل | `department, market, budget_range, timing` | Lead | SubmitForm | تحويل الطلب |
+| `generate_lead` | طلب قَبِله الخادم فعليًا (حُفظ في «طلبات التواصل» ووصل البريد) — لا يُرسل عند فشل الإرسال | `department, market, target_market, budget_range, timing` | Lead | SubmitForm | تحويل الطلب |
+| `lead_whatsapp_only` | أُرسل النموذج لكن تعذر حفظه على الخادم؛ الزائر فُتح له واتساب فقط | نفس المعاملات | — | — | للمراقبة فقط |
 | `quote_request` | زر "اطلب عرض سعر" لأي باقة أو حل | `package_id` (مثل `D04-GROWTH` أو `X03`)، `department` | Lead | SubmitForm | تحويل الطلب |
 | `whatsapp_click` | أي نقرة على واتساب | `link_location` (header / floating_button / packages …) | Contact | Contact | تحويل واتساب |
 | `email_click` | نقرة على البريد | `link_location` | Contact | Contact | — |

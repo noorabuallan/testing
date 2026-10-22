@@ -8,10 +8,10 @@
  */
 defined( 'ABSPATH' ) || exit;
 
-define( 'MKN_VERSION', '1.0.0' );
+define( 'MKN_VERSION', '1.1.0' );
 define( 'MKN_DIR', get_template_directory() );
 define( 'MKN_URI', get_template_directory_uri() );
 
-foreach ( array( 'data', 'setup', 'settings', 'content', 'render', 'seo', 'lead', 'import', 'admin' ) as $mkn_file ) {
+foreach ( array( 'data', 'setup', 'settings', 'content', 'render', 'seo', 'aioseo', 'lead', 'import', 'admin' ) as $mkn_file ) {
 	require_once MKN_DIR . '/inc/' . $mkn_file . '.php';
 }

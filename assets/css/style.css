@@ -1018,3 +1018,13 @@ body.wa-hide .wa-float { opacity: 0; transform: translateY(90px); pointer-events
   .logo-track .ltile.ltile--fill { padding: 3px; }
   .logo-track .ltile--fill img { max-height: 52px; }
 }
+
+/* v12 · service and market pages */
+.checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.checks li { position: relative; padding-inline-start: 28px; }
+.checks li::before { content: ""; position: absolute; inset-inline-start: 0; top: 10px; width: 14px; height: 14px; border-radius: 4px; background: var(--sky); box-shadow: 0 0 0 4px rgba(75,181,214,.18); }
+.section--dark .spec, .section--dark .spec li { border-color: var(--line-d); }
+.section--dark .spec li > span:first-child { color: var(--muted-d); }
+.section--aura .windex a, .section--white .windex a { border-color: var(--line); }
+.section--aura .windex a:hover, .section--white .windex a:hover { background: rgba(13,17,20,.04); }
+.section--aura .windex .n, .section--aura .windex span.s, .section--white .windex .n, .section--white .windex span.s { color: var(--muted); }

@@ -6,7 +6,8 @@ defined( 'ABSPATH' ) || exit;
 
 $mkn_depts = '';
 foreach ( (array) mkn_site( 'depts' ) as $mkn_d ) {
-	$mkn_depts .= '<li><a href="' . esc_url( mkn_url( 'services' ) . '#' . $mkn_d['key'] ) . '"><span class="ltr">' . esc_html( $mkn_d['code'] ) . '</span> · ' . esc_html( $mkn_d['short'] ) . '</a></li>';
+	$mkn_href   = ! empty( $mkn_d['slug'] ) && get_page_by_path( 'services/' . $mkn_d['slug'] ) ? mkn_url( 'services/' . $mkn_d['slug'] ) : mkn_url( 'services' ) . '#' . $mkn_d['key'];
+	$mkn_depts .= '<li><a href="' . esc_url( $mkn_href ) . '"><span class="ltr">' . esc_html( $mkn_d['code'] ) . '</span> · ' . esc_html( $mkn_d['short'] ) . '</a></li>';
 }
 ?>
 </main>
@@ -29,6 +30,7 @@ foreach ( (array) mkn_site( 'depts' ) as $mkn_d ) {
           <li><a href="<?php echo esc_url( mkn_url( 'work' ) ); ?>">أعمالنا</a></li>
           <li><a href="<?php echo esc_url( mkn_url( 'testimonials' ) ); ?>">آراء العملاء</a></li>
           <li><a href="<?php echo esc_url( mkn_url( 'insights' ) ); ?>">المقالات</a></li>
+          <?php if ( get_page_by_path( 'markets' ) ) : ?><li><a href="<?php echo esc_url( mkn_url( 'markets' ) ); ?>">الأسواق: الخليج</a></li><?php endif; ?>
         </ul>
       </div>
       <div>

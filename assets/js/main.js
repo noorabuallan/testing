@@ -291,9 +291,15 @@
           .then(function (res) { return res.ok ? res.json() : { ok: false }; })
           .then(function (j) { return !!(j && j.ok); }, function () { return false; });
       } catch (e) { mailed = Promise.resolve(false); }
-      if (window.MKN) window.MKN.track("generate_lead", {
-        form_id: "contact", method: "email_whatsapp", department: d.get("service") || "", market: d.get("country") || "",
+      // A lead counts only once the server has accepted it; otherwise the visitor still has WhatsApp.
+      var leadParams = {
+        form_id: "contact", department: d.get("service") || "", market: d.get("country") || "", target_market: d.get("country") || "",
         budget_range: d.get("budget") || "", timing: d.get("timing") || "", content_name: d.get("service") || ""
+      };
+      mailed.then(function (sent) {
+        if (!window.MKN) return;
+        if (sent) window.MKN.track("generate_lead", Object.assign({ method: "website_form" }, leadParams));
+        else window.MKN.track("lead_whatsapp_only", Object.assign({ method: "whatsapp" }, leadParams));
       });
       var url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
       window.open(url, "_blank", "noopener");
