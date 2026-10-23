@@ -16,7 +16,7 @@ function mkn_url( $slug ) {
 	} elseif ( 'insights' === $slug && get_option( 'page_for_posts' ) ) {
 		$url = get_permalink( (int) get_option( 'page_for_posts' ) );
 	} else {
-		$page = get_page_by_path( $slug, OBJECT, 'page' );
+		$page = get_page_by_path( $slug, OBJECT, array( 'page' ) );
 		if ( $page && in_array( $page->post_status, array( 'publish', 'private' ), true ) ) {
 			$url = get_permalink( $page );
 		}
@@ -114,6 +114,13 @@ function mkn_slot( $name, $arg ) {
 			return mkn_logos_rail( $arg );
 		case 'logo_wall':
 			return '<div class="logo-wall">' . implode( '', array_map( 'mkn_logo_tile', mkn_items( 'mkn_client' ) ) ) . '</div>';
+		case 'quotes': // exactly these testimonials, nothing added (market pages)
+			$out = '';
+			foreach ( array_filter( array_map( 'trim', explode( ',', $arg ) ) ) as $brand ) {
+				$t = mkn_testimonial_by_brand( $brand );
+				$out .= $t ? mkn_tcard( $t ) : '';
+			}
+			return $out;
 		case 'proof_quotes':
 			$want = array_filter( array_map( 'trim', explode( ',', $arg ) ) );
 			$used = array();

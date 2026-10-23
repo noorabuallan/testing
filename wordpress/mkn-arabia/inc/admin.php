@@ -119,7 +119,7 @@ function mkn_import_page() {
 		echo '</ul>';
 	}
 	if ( null !== $sync ) {
-		echo '<div class="notice notice-success"><p>تمت المزامنة: ' . (int) $sync[0] . ' صفحة حُدّث عنوانها ونُقل نصها القديم إلى المراجعات، و' . (int) $sync[1] . ' عنوان/وصف كُتب في AIOSEO.</p></div>';
+		echo '<div class="notice notice-success"><p>تمت المزامنة: ' . (int) $sync[0] . ' صفحة حُدّث عنوانها وحُفظ نصها القديم (في المراجعات وفي حقل _mkn_old_content)، و' . (int) $sync[1] . ' عنوان/وصف كُتب في AIOSEO.</p></div>';
 	}
 	echo '<form method="post">';
 	wp_nonce_field( 'mkn_import' );

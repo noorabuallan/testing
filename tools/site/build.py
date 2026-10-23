@@ -1685,7 +1685,7 @@ def market_page(m):
     quotes = sorted([t for t in TESTIMONIALS if t["country"] == code], key=lambda t: not (t["featured"] or t["case"]))[:3] if code else []
     proof = ""
     if quotes:
-        cards = f"[[proof_quotes|{','.join(html.unescape(t['brand']) for t in quotes)}]]" if THEME else "".join(tcard(t) for t in quotes)
+        cards = f"[[quotes|{','.join(html.unescape(t['brand']) for t in quotes)}]]" if THEME else "".join(tcard(t) for t in quotes)
         proof = f'''<div class="grid g3" style="margin-top:20px">{cards}</div>
     <p style="margin-top:16px"><a href="testimonials.html#{code}" class="arrow">كل آراء العملاء في {short} </a></p>'''
     else:

@@ -230,7 +230,7 @@ add_filter( 'wp_sitemaps_add_provider', function ( $provider, $name ) {
 
 add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
 	if ( 'page' === $post_type ) {
-		$utm = get_page_by_path( 'utm' );
+		$utm = get_page_by_path( 'utm', OBJECT, array( 'page' ) );
 		if ( $utm ) {
 			$args['post__not_in'] = array_merge( isset( $args['post__not_in'] ) ? (array) $args['post__not_in'] : array(), array( $utm->ID ) );
 		}

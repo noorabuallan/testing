@@ -191,6 +191,19 @@ function mkn_remove_sample_content() {
 	}
 }
 
+/**
+ * A media file left by an older site can hold the address a new page needs (e.g. an image named
+ * «branding» attached to the Services page). Give that file a different address so the page gets it.
+ */
+function mkn_free_slug( $slug, $parent_id ) {
+	global $wpdb;
+	$taken = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_name = %s AND post_parent = %d", $slug, (int) $parent_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	foreach ( $taken as $id ) {
+		wp_update_post( array( 'ID' => (int) $id, 'post_name' => $slug . '-image' ) );
+		mkn_import_log( 'غُيّر رابط ملف وسائط قديم (' . $slug . ') ليأخذ الصفحة الجديدة عنوانها.' );
+	}
+}
+
 /** Insert one seed item with its meta in a single call. */
 function mkn_seed_insert( $args, $key, $meta ) {
 	$meta['_mkn_seed_key'] = $key;
@@ -204,6 +217,7 @@ function mkn_seed_insert( $args, $key, $meta ) {
 
 function mkn_import_run( $force = false ) {
 	// One run at a time: add_option is atomic, a lock older than 10 minutes is stale.
+	global $wpdb;
 	$lock = (int) get_option( 'mkn_seed_lock' );
 	if ( $lock ) {
 		if ( time() - $lock < 10 * MINUTE_IN_SECONDS && ! $force ) {
@@ -211,7 +225,11 @@ function mkn_import_run( $force = false ) {
 		}
 		delete_option( 'mkn_seed_lock' );
 	}
-	if ( ! add_option( 'mkn_seed_lock', time(), '', 'no' ) && ! $force ) {
+	// INSERT IGNORE is atomic: of two requests arriving together, only one gets the lock.
+	$got = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES ('mkn_seed_lock', %s, 'no')", (string) time() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	wp_cache_delete( 'mkn_seed_lock', 'options' );
+	wp_cache_delete( 'notoptions', 'options' );
+	if ( ! $got && ! $force ) {
 		return;
 	}
 	if ( function_exists( 'set_time_limit' ) ) {
@@ -241,7 +259,7 @@ function mkn_import_run( $force = false ) {
 	/* Pages. */
 	$ids = array();
 	foreach ( mkn_seed_pages() as $slug => $title ) {
-		$p = get_page_by_path( $slug, OBJECT, 'page' );
+		$p = get_page_by_path( $slug, OBJECT, array( 'page' ) );
 		if ( $p ) {
 			$ids[ $slug ] = $p->ID;
 			if ( ! get_post_meta( $p->ID, '_mkn_seed_key', true ) ) {
@@ -256,6 +274,7 @@ function mkn_import_run( $force = false ) {
 		if ( $parent && empty( $ids[ $parent ] ) ) {
 			continue; // the parent page was removed on purpose
 		}
+		mkn_free_slug( basename( $slug ), $parent ? $ids[ $parent ] : 0 );
 		$id = mkn_seed_insert( array( 'post_type' => 'page', 'post_title' => $title, 'post_name' => basename( $slug ), 'post_parent' => $parent ? $ids[ $parent ] : 0, 'post_content' => '', 'comment_status' => 'closed', 'ping_status' => 'closed', 'menu_order' => count( $ids ) ), 'page:' . $slug, array() );
 		if ( $id ) {
 			$ids[ $slug ] = $id;

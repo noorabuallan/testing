@@ -69,10 +69,16 @@ add_filter( 'aioseo_schema_output', function ( $graph ) {
 		return $graph;
 	}
 	$org_id = trailingslashit( home_url() ) . '#organization';
+	if ( isset( aioseo()->options->searchAppearance->global->schema->siteRepresents ) && 'person' === aioseo()->options->searchAppearance->global->schema->siteRepresents ) {
+		$org_id = trailingslashit( home_url() ) . '#person';
+	}
 	foreach ( $graph as $i => $node ) {
 		$type = isset( $node['@type'] ) ? (array) $node['@type'] : array();
 		if ( array_intersect( $type, array( 'BlogPosting', 'Article', 'NewsArticle' ) ) ) {
 			// Articles are written by the MKN ARABIA team, not by a WordPress user account.
+			$graph[ $i ]['author'] = array( '@id' => $org_id );
+		}
+		if ( array_intersect( $type, array( 'WebPage', 'ItemPage', 'CollectionPage' ) ) && isset( $node['author'] ) && is_singular( 'post' ) ) {
 			$graph[ $i ]['author'] = array( '@id' => $org_id );
 		}
 		if ( array_intersect( $type, array( 'Organization' ) ) && empty( $node['areaServed'] ) ) {
@@ -130,14 +136,18 @@ function mkn_aioseo_sync( $overwrite = false ) {
 		}
 		$id = 'home' === $path ? (int) get_option( 'page_on_front' ) : ( 'insights' === $path ? (int) get_option( 'page_for_posts' ) : 0 );
 		if ( ! $id ) {
-			$p  = get_page_by_path( $path, OBJECT, 'page' );
+			$p  = get_page_by_path( $path, OBJECT, array( 'page' ) );
 			$id = $p ? $p->ID : 0;
 		}
 		if ( $id ) {
 			$jobs[ $id ] = array( $pg['title'], $pg['desc'] );
 		}
 	}
+	$designed = array_keys( $jobs );
 	foreach ( get_posts( array( 'post_type' => 'post', 'posts_per_page' => -1, 'post_status' => 'publish', 'fields' => 'ids' ) ) as $id ) {
+		if ( get_post_meta( $id, '_mkn_seed_key', true ) ) {
+			$designed[] = $id; // the theme's own articles
+		}
 		$t = mkn_meta( $id, 'seo_title' );
 		$d = has_excerpt( $id ) ? get_post_field( 'post_excerpt', $id ) : '';
 		if ( $t || $d ) {
@@ -146,7 +156,7 @@ function mkn_aioseo_sync( $overwrite = false ) {
 	}
 	$n = 0;
 	// The internal campaign-link tool stays out of search results and the sitemap.
-	$utm = get_page_by_path( 'utm', OBJECT, 'page' );
+	$utm = get_page_by_path( 'utm', OBJECT, array( 'page' ) );
 	if ( $utm ) {
 		$row = \AIOSEO\Plugin\Common\Models\Post::getPost( $utm->ID );
 		if ( empty( $row->robots_noindex ) ) {
@@ -160,11 +170,12 @@ function mkn_aioseo_sync( $overwrite = false ) {
 	foreach ( $jobs as $id => $td ) {
 		$row     = \AIOSEO\Plugin\Common\Models\Post::getPost( $id );
 		$changed = false;
-		if ( $td[0] && ( $overwrite || empty( $row->title ) ) ) {
+		$force   = $overwrite && in_array( $id, $designed, true ); // other articles: fill only if empty
+		if ( $td[0] && ( $force || empty( $row->title ) ) ) {
 			$row->title = $td[0];
 			$changed    = true;
 		}
-		if ( $td[1] && ( $overwrite || empty( $row->description ) ) ) {
+		if ( $td[1] && ( $force || empty( $row->description ) ) ) {
 			$row->description = $td[1];
 			$changed          = true;
 		}
@@ -184,14 +195,27 @@ function mkn_aioseo_sync( $overwrite = false ) {
 function mkn_sync_designed_pages() {
 	$n = 0;
 	foreach ( mkn_seed_pages() as $path => $title ) {
-		$p = get_page_by_path( $path, OBJECT, 'page' );
+		$p = get_page_by_path( $path, OBJECT, array( 'page' ) );
 		if ( ! $p ) {
 			continue;
 		}
-		if ( $p->post_title !== $title || '' !== trim( $p->post_content ) ) {
-			wp_update_post( array( 'ID' => $p->ID, 'post_title' => $title, 'post_content' => '' ) );
-			$n++;
+		if ( $p->post_title === $title && '' === trim( $p->post_content ) ) {
+			continue;
 		}
+		$content = $p->post_content;
+		if ( '' !== trim( $content ) ) {
+			// Keep the old text: as a revision when revisions are on, and always in a field on the page.
+			if ( wp_revisions_enabled( $p ) ) {
+				$last = wp_get_post_revisions( $p->ID, array( 'posts_per_page' => 1 ) );
+				$last = $last ? reset( $last ) : null;
+				if ( ! $last || $last->post_content !== $content ) {
+					_wp_put_post_revision( $p );
+				}
+			}
+			update_post_meta( $p->ID, '_mkn_old_content', wp_slash( $content ) );
+		}
+		wp_update_post( array( 'ID' => $p->ID, 'post_title' => $title, 'post_content' => '' ) );
+		$n++;
 	}
 	return $n;
 }
