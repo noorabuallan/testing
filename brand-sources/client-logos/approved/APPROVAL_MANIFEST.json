@@ -1,0 +1,21 @@
+{
+  "approval_date": "2026-10-11",
+  "E SPA Dubai": {
+    "status": "approved_from_user_uploaded_image",
+    "approved_file": "E_SPA_APPROVED_Original.png",
+    "canva_import": "E_SPA_Approved_Canva_Source.pdf",
+    "policy": "Only the exact supplied E SPA Nails & Hair logo; never replace with another E Spa artwork or typographic recreation."
+  },
+  "IMPERIO Events": {
+    "status": "approved_from_user_uploaded_company_profile",
+    "source_document": "IMPIRO company profile...pdf",
+    "source_page": 37,
+    "approved_variants": [
+      "IMPERIO_Approved_Wordmark.png",
+      "IMPERIO_Approved_Seal.png"
+    ],
+    "canva_import": "IMPERIO_Approved_Canva_Source.pdf",
+    "policy": "Use only logo designs extracted from the company profile, not designs/logos of clients pictured in the profile."
+  },
+  "unaffected_clients": "No change to logos of other clients."
+}

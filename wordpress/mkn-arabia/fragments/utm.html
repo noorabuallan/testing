@@ -1,0 +1,71 @@
+<section class="page-hero grain">
+  <svg class="grid-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="14" y1="0" x2="14" y2="100"/><line x1="86" y1="0" x2="86" y2="100"/><line x1="0" y1="30" x2="100" y2="30"/><line x1="0" y1="70" x2="100" y2="70"/><line x1="14" y1="0" x2="86" y2="100"/></svg>
+  <div class="container">
+    <span class="label" lang="en">INTERNAL TOOL · UTM BUILDER</span>
+    <h1>منشئ روابط الحملات.</h1>
+    <p>أداة داخلية لفريق MKN&nbsp;ARABIA: أنشئ رابطًا موحدًا لكل حملة أو منشور، حتى يظهر مصدر كل زيارة وكل طلب في Google Analytics وفي رسالة واتساب.</p>
+    <span class="chip"><span class="dot"></span>سوّق بالعربي، سوّق صح</span>
+  </div>
+</section>
+<section class="section section--white">
+  <div class="container contact-grid">
+    <div class="form glass glass--light" id="utm-form">
+      <div class="field"><label for="u-page">الصفحة</label>
+        <select id="u-page"><option value="{{u:home}}">الرئيسية</option><option value="{{u:home}}#by-business">الرئيسية — ابدأ من نوع نشاطك</option><option value="{{u:services}}">الخدمات</option><option value="{{u:pricing}}">الباقات</option><option value="{{u:pricing}}#x06">الحلول — نمو أعمال الخدمات (X06)</option><option value="{{u:work}}">أعمالنا</option><option value="{{u:testimonials}}">آراء العملاء</option><option value="{{u:about}}">من نحن</option><option value="{{u:contact}}">تواصل</option><option value="{{u:insights}}">المقالات</option></select></div>
+      <div class="field"><label for="u-preset">القناة (يملأ المصدر والوسيط تلقائيًا)</label>
+        <select id="u-preset">
+          <option value="facebook|paid_social">Meta Ads — Facebook</option>
+          <option value="instagram|paid_social">Meta Ads — Instagram</option>
+          <option value="google|cpc">Google Ads — Search</option>
+          <option value="google|display">Google Ads — Display</option>
+          <option value="youtube|paid_video">YouTube Ads</option>
+          <option value="tiktok|paid_social">TikTok Ads</option>
+          <option value="snapchat|paid_social">Snapchat Ads</option>
+          <option value="linkedin|paid_social">LinkedIn Ads</option>
+          <option value="instagram|social">Instagram — منشور / بايو</option>
+          <option value="linkedin|social">LinkedIn — منشور</option>
+          <option value="whatsapp|messaging">WhatsApp — رسالة / حالة</option>
+          <option value="email|email">Email</option>
+          <option value="qr|offline">QR — مطبوعات</option>
+          <option value="|">مخصص</option>
+        </select></div>
+      <div class="form-row">
+        <div class="field"><label for="u-source">utm_source *</label><input type="text" id="u-source" dir="ltr" required></div>
+        <div class="field"><label for="u-medium">utm_medium *</label><input type="text" id="u-medium" dir="ltr" required></div>
+      </div>
+      <div class="field"><label for="u-campaign">utm_campaign * <span class="muted">(مثال: ksa-leadgen-2026-11)</span></label><input type="text" id="u-campaign" dir="ltr" required></div>
+      <div class="form-row">
+        <div class="field"><label for="u-content">utm_content <span class="muted">(الإعلان / التصميم)</span></label><input type="text" id="u-content" dir="ltr"></div>
+        <div class="field"><label for="u-term">utm_term <span class="muted">(الكلمة / الجمهور)</span></label><input type="text" id="u-term" dir="ltr"></div>
+      </div>
+    </div>
+    <div>
+      <span class="label" lang="en">RESULT</span>
+      <h3 style="margin:8px 0 14px">الرابط الجاهز</h3>
+      <div id="u-out" class="ltr" style="display:block;text-align:left;word-break:break-all;background:var(--ink);color:#fff;padding:20px;font-family:var(--mono);font-size:14px;min-height:90px"></div>
+      <button type="button" id="u-copy" class="btn btn--blue" style="margin-top:14px">نسخ الرابط</button>
+      <ul class="spec" style="margin-top:28px">
+        <li><span>القاعدة</span><div>أحرف إنجليزية صغيرة وشرطات فقط، بدون مسافات.</div></li>
+        <li><span>campaign</span><div>السوق-الهدف-السنة-الشهر، مثل <b class="ltr">ksa-leadgen-2026-11</b></div></li>
+        <li><span>content</span><div>اسم التصميم أو الإعلان، مثل <b class="ltr">reel-01</b></div></li>
+        <li><span>term</span><div>الكلمة المفتاحية أو الجمهور، مثل <b class="ltr">spa-riyadh</b></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  function slug(v){return (v||"").trim().toLowerCase().replace(/\s+/g,"-").replace(/[^a-z0-9\-_.]/g,"")}
+  function preset(){var p=$("u-preset").value.split("|"); if(p[0]||p[1]){$("u-source").value=p[0];$("u-medium").value=p[1];} build();}
+  function build(){
+    var v=$("u-page").value, h="", k=v.indexOf("#"); if(k>=0){h=v.slice(k);v=v.slice(0,k);} var base=v, q=new URLSearchParams();
+    [["utm_source","u-source"],["utm_medium","u-medium"],["utm_campaign","u-campaign"],["utm_content","u-content"],["utm_term","u-term"]].forEach(function(k){var v=slug($(k[1]).value); if(v) q.set(k[0],v);});
+    $("u-out").textContent=base+(q.toString()?"?"+q.toString():"")+h;
+  }
+  $("u-preset").addEventListener("change",preset);
+  document.querySelectorAll("#utm-form input, #utm-form select").forEach(function(el){el.addEventListener("input",build)});
+  $("u-copy").addEventListener("click",function(){var t=$("u-out").textContent; try{navigator.clipboard.writeText(t); this.textContent="تم النسخ ✓";}catch(e){}});
+  preset();
+})();
+</script>
